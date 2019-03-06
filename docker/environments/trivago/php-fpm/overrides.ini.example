@@ -1,0 +1,15 @@
+upload_max_filesize = 100M
+post_max_size = 108M
+display_errors = On
+display_startup_errors = On
+error_log = "/var/log/php-fpm/error.log"
+
+;[Xdebug]
+xdebug.remote_enable=1
+xdebug.remote_autostart=1
+xdebug.remote_connect_back=1
+xdebug.remote_handler=dbgp
+xdebug.remote_mode=req
+xdebug.remote_host=${NGINX_HOST}
+xdebug.remote_port=9009
+xdebug.idekey=PHPSTORM
