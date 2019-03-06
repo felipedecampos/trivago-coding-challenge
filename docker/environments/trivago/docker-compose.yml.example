@@ -1,0 +1,93 @@
+version: "3.3"
+
+services:
+  webserver:
+    image: nginx:alpine
+    container_name: ${PROJECT_NAME}-webserver
+    restart: always
+    working_dir: /var/www
+    volumes:
+      - ${PROJECT_PATH}:/var/www/${PROJECT_NAME}
+      - ${DOCKER_PROJECT_PATH}/environments/trivago/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ${DOCKER_PROJECT_PATH}/environments/trivago/logs/nginx:/var/log/nginx/
+    links:
+      - php-fpm
+    ports:
+      - "8009:80"
+      - "9009:9000"
+    networks:
+      ${NETWORK_NAME}:
+        ipv4_address: ${NGINX_HOST}
+
+  php-fpm:
+    build: php-fpm
+    container_name: ${PROJECT_NAME}-php-fpm
+    image: ${PROJECT_NAME}/php-fpm:latest
+    restart: always
+    working_dir: /var/www
+    volumes:
+      - ${PROJECT_PATH}:/var/www/${PROJECT_NAME}
+      - ${DOCKER_PROJECT_PATH}/environments/trivago/php-fpm/overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
+      - ${DOCKER_PROJECT_PATH}/environments/trivago/logs/php-fpm:/var/log/php-fpm
+    external_links:
+      - webserver:${APP_URL}
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    networks:
+      ${NETWORK_NAME}:
+        ipv4_address: ${PHP_HOST}
+
+  postgres:
+    image: postgres:9.6-alpine
+    container_name: ${PROJECT_NAME}-postgres
+    restart: always
+    volumes:
+      - ${POSTGRES_PATH}:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      ${NETWORK_NAME}:
+        ipv4_address: ${POSTGRES_HOST}
+
+  redis:
+    image: redis:alpine
+    container_name: ${PROJECT_NAME}-redis
+    restart: always
+    volumes:
+      - ${REDIS_PATH}:/var/lib/redis
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      ${NETWORK_NAME}:
+        ipv4_address: ${REDIS_HOST}
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    container_name: ${PROJECT_NAME}-rabbitmq
+    restart: always
+    volumes:
+      - ${RMQ_PATH}:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=E7zC&nZO}*gPKSs
+      - RABBITMQ_DEFAULT_USER=mqadmin
+      - RABBITMQ_DEFAULT_PASS=123456
+    hostname: rabbitmq
+    ports:
+      - "${RMQ_PORT}:15672"
+    networks:
+      ${NETWORK_NAME}:
+        ipv4_address: ${RMQ_HOST}
+
+networks:
+  ${NETWORK_NAME}:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: ${NETWORK_IP}/16
