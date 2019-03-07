@@ -4,11 +4,17 @@ projectpath="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 globalpath="$(dirname "$(dirname "$projectpath")")"
 
 if ! source $globalpath/.env; then
-    echo -e "The global .env file not found to uninstall the project"
+    clear
+    echo -e "The global .env file not found to uninstall the project \n"
+    read -p ''
+    exit 1
 fi
 
 if ! source $projectpath/.env; then
-    echo -e "The project .env file not found to uninstall the project"
+    clear
+    echo -e "The .env file not found to uninstall the project \n"
+    read -p ''
+    exit 1
 fi
 
 echo -e "\e[33m"

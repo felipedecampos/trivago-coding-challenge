@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if source ././.env; then
-    if [ -z "$NETWORK_NAME" ] || [ -z "$NETWORK_IP" ]; then
-        echo -e "There isn't a network with this name: \e[32m$NETWORK_NAME\e[0m, set up yet! \n"
+    if [ "$NETWORK_NAME" = "{NETWORK_NAME}" ] || [ "$NETWORK_IP" = "{NETWORK_IP}" ]; then
+        echo -e "There isn't any Network set up yet! \n"
         read -p ''
         exit 0
     fi
