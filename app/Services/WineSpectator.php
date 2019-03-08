@@ -2,18 +2,23 @@
 
 namespace App\Services;
 
-use App\External\Api\Client;
-use App\External\WineSpectator\WineSpectatorAuthenticator;
-use App\Models\Wine;
+
+use App\Repositories\WineSpectatorRepository;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class WineSpectatorService
 {
+    public $wsRepo;
+
+    public function __construct(WineSpectatorRepository $wineSpectatorRepo)
+    {
+        $this->wsRepo = $wineSpectatorRepo;
+    }
+
     /**
      * @param string $day
      * @return bool
-     * @throws \Exception
      */
     public function updateWines(string $day = 'today')
     {
@@ -28,23 +33,14 @@ class WineSpectatorService
             DB::beginTransaction();
 
             foreach ($wines as $wine) {
-                $model = Wine::find($wine['guid']);
+                $status = $this->wsRepo->put($wine);
 
-                $wineModel = is_null($model)
-                    ? new Wine()
-                    : $model;
-
-                $wineModel->fill($wine);
-
-                if (is_null($model)) {
-                    $wineModel->setAttribute('guid', $wine['guid']);
-                }
-
-                if (true !== $wineModel->save()) {
+                if (true !== $status) {
                     $exceptionMessage = sprintf(
                         "Could not possible save the wine: %s",
                         print_r($wine, true)
                     );
+
                     throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
                 }
             }

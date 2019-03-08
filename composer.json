@@ -39,7 +39,8 @@
             "database/seeds",
             "database/factories",
             "app/Models",
-            "app/Services"
+            "app/Services",
+            "app/Repositories"
         ]
     },
     "autoload-dev": {

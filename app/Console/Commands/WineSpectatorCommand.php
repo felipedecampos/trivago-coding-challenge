@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Services\WineSpectatorService;
 use Illuminate\Console\Command;
 
-class WineSpectator extends Command
+class WineSpectatorCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -35,15 +35,20 @@ class WineSpectator extends Command
      * Execute the console command.
      *
      * @param WineSpectatorService $wine_spectator
-     * @return void
-     * @throws \Exception
+     * @return bool
      */
     public function handle(WineSpectatorService $wine_spectator)
     {
         $status = $wine_spectator->updateWines($this->argument('day'));
 
-        echo $status === true
-            ? "Wines were successfully updated.\n"
-            : "$status \n";
+        if ($status === true) {
+            $this->info('Wines were successfully updated.');
+
+            return true;
+        }
+
+        $this->error($status);
+
+        return false;
     }
 }
