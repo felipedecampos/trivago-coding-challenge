@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\WineSpectatorRepository;
+use App\Services\WineSpectatorService;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +16,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(WineSpectatorService::class, function (Application $app): WineSpectatorService {
+            return new WineSpectatorService(
+                config('external.wine-spectator.rss'),
+                $app->get('db'),
+                $app->get(WineSpectatorRepository::class)
+            );
+        });
     }
 
     /**
