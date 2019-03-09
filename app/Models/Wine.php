@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class Wine
+ * @codeCoverageIgnore
+ */
 class Wine extends Model
 {
     use SoftDeletes;
@@ -22,6 +26,7 @@ class Wine extends Model
         'created_at',
         'updated_at'
     ];
+
     /**
      * The attributes that should be mutated to dates.
      *

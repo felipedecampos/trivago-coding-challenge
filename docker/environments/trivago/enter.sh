@@ -36,10 +36,6 @@ handleContainers()
             sudo docker exec -it $PROJECT_NAME-redis sh
             break
 
-        elif [[ ${runningContainers[$inputService]} = "$PROJECT_NAME-rabbitmq" ]]; then
-            sudo docker exec -it $PROJECT_NAME-rabbitmq sh
-            break
-
         elif [[ ${runningContainers[$inputService]} = "$PROJECT_NAME-postgres" ]]; then
             echo -e " Type the password to postgres user: \e[32m$POSTGRES_USER\e[0m and database: \e[32m$POSTGRES_DB\e[0m\n"
             sudo docker exec -it $PROJECT_NAME-postgres psql $POSTGRES_DB $POSTGRES_USER

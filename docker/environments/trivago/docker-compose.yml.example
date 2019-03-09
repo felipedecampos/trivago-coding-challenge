@@ -68,23 +68,6 @@ services:
       ${NETWORK_NAME}:
         ipv4_address: ${REDIS_HOST}
 
-  rabbitmq:
-    image: rabbitmq:alpine
-    container_name: ${PROJECT_NAME}-rabbitmq
-    restart: always
-    volumes:
-      - ${RMQ_PATH}:/var/lib/rabbitmq
-    environment:
-      - RABBITMQ_ERLANG_COOKIE=E7zC&nZO}*gPKSs
-      - RABBITMQ_DEFAULT_USER=mqadmin
-      - RABBITMQ_DEFAULT_PASS=123456
-    hostname: rabbitmq
-    ports:
-      - "${RMQ_PORT}:15672"
-    networks:
-      ${NETWORK_NAME}:
-        ipv4_address: ${RMQ_HOST}
-
 networks:
   ${NETWORK_NAME}:
     driver: bridge
