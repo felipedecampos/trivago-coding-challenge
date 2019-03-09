@@ -2,42 +2,56 @@
 
 namespace App\Services;
 
-
 use App\Repositories\WineSpectatorRepository;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 
 class WineSpectatorService
 {
-    public $wsRepo;
+    /**
+     * @var string
+     */
+    protected $rssUrl;
 
-    public function __construct(WineSpectatorRepository $wineSpectatorRepo)
-    {
-        $this->wsRepo = $wineSpectatorRepo;
+    /**
+     * @var DatabaseManager
+     */
+    protected $db;
+
+    /**
+     * @var WineSpectatorRepository
+     */
+    public $wineSpectatorRepository;
+
+    public function __construct(
+        string $rssUrl,
+        DatabaseManager $db,
+        WineSpectatorRepository $wineSpectatorRepository
+    ) {
+        $this->rssUrl = $rssUrl;
+        $this->db = $db;
+        $this->wineSpectatorRepository = $wineSpectatorRepository;
     }
 
     /**
-     * @param string $day
-     * @return bool
+     * @param \DateTime|null $dateTime
+     * @return void
+     * @throws \Exception
      */
-    public function updateWines(string $day = 'today')
+    public function updateWines(\DateTime $dateTime = null)
     {
         try {
 
-            $today = $day === 'all'
-                ? null
-                : new \DateTime('today', new \DateTimeZone('-05:00'));
+            $wines = $this->fetchWines($dateTime);
 
-            $wines = $this->getWines($today);
-
-            DB::beginTransaction();
+            $this->db->beginTransaction();
 
             foreach ($wines as $wine) {
-                $status = $this->wsRepo->put($wine);
+                $status = $this->wineSpectatorRepository->put($wine);
 
                 if (true !== $status) {
                     $exceptionMessage = sprintf(
-                        "Could not possible save the wine: %s",
+                        'Could not save the wine: %s',
                         print_r($wine, true)
                     );
 
@@ -45,28 +59,26 @@ class WineSpectatorService
                 }
             }
 
-            DB::commit();
+            $this->db->commit();
 
         } catch (\Exception $e) {
 
-            DB::rollBack();
+            $this->db->rollBack();
 
-            return '(' . $e->getCode() . ') - ' . $e->getMessage();
+            throw $e;
 
         }
-
-        return true;
     }
 
     /**
-     * Display a listing of the resource.
+     * Fetches the rss feed and parses them to wine objects
      *
      * @param \DateTime|null $date
      * @return array
      */
-    private function getWines(\DateTime $date = null): array
+    private function fetchWines(\DateTime $date = null): array
     {
-        $wines = $this->watch($date);
+        $wines = $this->fetchWineList($date);
 
         if (! count($wines)) {
             return $wines;
@@ -74,9 +86,16 @@ class WineSpectatorService
 
         foreach ($wines as &$wine) {
             $wine += $this->parseTitle($wine['title']);
-            $wine ['pub_date']= $wine['pubDate'];
+            $wine['pub_date'] = $wine['pubDate'];
 
-            unset($wine['title'], $wine['description'], $wine['author'], $wine['category'], $wine['id'], $wine['pubDate']);
+            unset(
+                $wine['title'],
+                $wine['description'],
+                $wine['author'],
+                $wine['category'],
+                $wine['id'],
+                $wine['pubDate']
+            );
         }
 
         return $wines;
@@ -86,18 +105,15 @@ class WineSpectatorService
      * @param \DateTime|null $pubDateFilter
      * @return array
      */
-    private function watch(\DateTime $pubDateFilter = null): array
+    private function fetchWineList(\DateTime $pubDateFilter = null): array
     {
-        $config = config('external.wine-spectator');
-
-        $content = file_get_contents($config['rss']);
+        $content = file_get_contents($this->rssUrl);
         $xmlObj  = new \SimpleXmlElement($content);
         $objArr  = json_decode(json_encode($xmlObj), true);
 
         $wines = $objArr['channel']['item'] ?? [];
-
-        if (count($wines) && $pubDateFilter instanceof \DateTime) {
-            $wines = array_filter($objArr['channel']['item'], function ($wine) use ($pubDateFilter) {
+        if ($pubDateFilter !== null && count($wines)) {
+            $wines = array_filter($wines, function ($wine) use ($pubDateFilter) {
                 $pubDate = new \DateTime($wine['pubDate']);
 
                 return $pubDateFilter == $pubDate;
