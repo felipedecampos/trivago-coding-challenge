@@ -114,23 +114,6 @@ fi
 
 r_redispath=${redispath////\\/}
 
-read -p "RabbitMQ host [$networkipbase.6]: " rabbitmqhost
-if [[ -z "$rabbitmqhost" ]]; then
-    rabbitmqhost="$networkipbase.6"
-fi
-
-read -p "RabbitMQ port [63799] (you must use 5 characters): " rabbitmqport
-if [ -z "$rabbitmqport" ]; then
-    rabbitmqport="63799"
-fi
-
-read -p "RabbitMQ data path [/home/$USER/Workspace/.rabbitmq/$r_projectname]: " rmqpath
-if [ -z "$rmqpath" ]; then
-    rmqpath="/home/$USER/Workspace/.rabbitmq/$r_projectname"
-fi
-
-r_rmqpath=${rmqpath////\\/}
-
 r_dockerprojectpath=${DOCKER_PROJECT_PATH////\\/}
 
 printf "\n"
@@ -153,9 +136,6 @@ sed -i "s/{POSTGRES_PATH}/$r_postgrespath/g" $DOCKER_PROJECT_PATH/environments/t
 sed -i "s/{REDIS_HOST}/$redishost/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
 sed -i "s/{REDIS_PORT}/$redisport/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
 sed -i "s/{REDIS_PATH}/$r_redispath/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
-sed -i "s/{RMQ_HOST}/$rabbitmqhost/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
-sed -i "s/{RMQ_PORT}/$rabbitmqport/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
-sed -i "s/{RMQ_PATH}/$r_rmqpath/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
 
 yes | cp -i $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml.example $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 
@@ -175,9 +155,6 @@ sed -i "s/\${POSTGRES_PATH}/$r_postgrespath/g" $DOCKER_PROJECT_PATH/environments
 sed -i "s/\${REDIS_HOST}/$redishost/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${REDIS_PORT}/$redisport/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${REDIS_PATH}/$r_redispath/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
-sed -i "s/\${RMQ_HOST}/$rabbitmqhost/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
-sed -i "s/\${RMQ_PORT}/$rabbitmqport/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
-sed -i "s/\${RMQ_PATH}/$r_rmqpath/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${NETWORK_NAME}/$NETWORK_NAME/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${NETWORK_IP}/$NETWORK_IP/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${DOCKER_PROJECT_PATH}/$r_dockerprojectpath/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
@@ -194,6 +171,12 @@ yes | cp -i $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/overrides.ini.exam
 echo -e "\n"
 
 sed -i "s/\${NGINX_HOST}/$nginxhost/g" $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/overrides.ini
+
+yes | cp -i $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/laravel-cron.example $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/laravel-cron
+
+echo -e "\n"
+
+sed -i "s/{PROJECT_NAME}/$r_projectname/g" $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/laravel-cron
 
 read -p "Are you sure do you want to install the project [$r_projectname] y/n? [y]: " yn
 if [[ "$yn" != "n" ]]; then
@@ -233,7 +216,7 @@ if [[ "$yn" != "n" ]]; then
         'DB_DATABASE=homestead'
     ], [
         'APP_NAME=$r_projectname',
-        'APP_URL=$appurl',
+        'APP_URL=http://$appurl',
         'DB_CONNECTION=$dbconnection',
         'DB_HOST=$dbhost',
         'DB_PORT=${dbport%?}',
@@ -294,10 +277,9 @@ if [[ "$yn" != "n" ]]; then
     sudo chmod 777 $(find ../storage/ -not -name ".gitignore")
     sudo chmod 777 $(find ../bootstrap/cache/ -not -name ".gitignore")
 
-    read -p "Would you like to execute migrations (notice: this will erase the tables and recreate them) y/n? [n]: " yn
-    if [ "$yn" = "y" ]; then
-        sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan migrate:refresh --seed"
-    fi
+    sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan migrate:refresh --seed"
+
+    sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan wine-spectator:watch all"
 
     echo -e "Project \e[32m$r_projectname\e[0m was successfully installed \n"
 

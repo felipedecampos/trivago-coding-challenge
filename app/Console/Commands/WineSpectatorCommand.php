@@ -12,7 +12,7 @@ class WineSpectatorCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'wine-spectator:watch {day=today}';
+    protected $signature = 'wine-spectator:watch {date=today}';
 
     /**
      * The console command description.
@@ -34,12 +34,18 @@ class WineSpectatorCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param WineSpectatorService $wine_spectator
+     * @param WineSpectatorService $wineSpectator
      * @return bool
+     * @throws \Exception
      */
-    public function handle(WineSpectatorService $wine_spectator)
+    public function handle(WineSpectatorService $wineSpectator)
     {
-        $status = $wine_spectator->updateWines($this->argument('day'));
+        $date = null;
+        if ($this->argument('date') !== 'all') {
+            $date = new \DateTime($this->argument('date'), new \DateTimeZone('-05:00'));
+        }
+
+        $status = $wineSpectator->updateWines($date);
 
         if ($status === true) {
             $this->info('Wines were successfully updated.');
@@ -47,7 +53,7 @@ class WineSpectatorCommand extends Command
             return true;
         }
 
-        $this->error($status);
+        $this->error('Could not save the wines.');
 
         return false;
     }

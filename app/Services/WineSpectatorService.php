@@ -35,7 +35,7 @@ class WineSpectatorService
 
     /**
      * @param \DateTime|null $dateTime
-     * @return void
+     * @return bool
      * @throws \Exception
      */
     public function updateWines(\DateTime $dateTime = null)
@@ -68,6 +68,8 @@ class WineSpectatorService
             throw $e;
 
         }
+
+        return true;
     }
 
     /**

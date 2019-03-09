@@ -4,7 +4,7 @@ WORKDIR "/var/www"
 
 # Install selected extensions and other stuff
 RUN apt-get update \
-    && apt-get -q -y install --no-install-recommends ca-certificates curl acl sudo vim \
+    && apt-get -q -y install --no-install-recommends ca-certificates curl acl sudo vim cron \
     php7.2-mbstring php-xdebug php7.2-sockets php7.2-pgsql php7.2-pdo-pgsql php7.2-redis \
     php7.2-xml php7.2-json php7.2-gd php7.2-curl
 
@@ -25,3 +25,14 @@ RUN apt-get install -yq gcc g++ make
 
 # fix npm - not the latest version installed by apt-get
 RUN npm install -g npm
+
+# Add crontab file in the cron directory
+COPY ./laravel-cron /etc/cron.d/laravel-cron
+
+ADD ./laravel-cron /var/spool/cron/crontabs/root
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/laravel-cron
+RUN chmod +x /etc/cron.d/laravel-cron
+
+RUN service cron start

@@ -5,10 +5,16 @@ namespace App\Repositories;
 
 use App\Models\Wine;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
-use Illuminate\Http\Response;
 
+/**
+ * Class WineSpectatorRepository
+ * @codeCoverageIgnore
+ */
 class WineSpectatorRepository implements RepositoryInterface
 {
+    /**
+     * @var Wine
+     */
     public $wine;
 
     function __construct(Wine $wine) {

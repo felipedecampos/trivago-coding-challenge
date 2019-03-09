@@ -2,7 +2,10 @@
 
 namespace App\Repositories\RepositoryInterface;
 
-
+/**
+ * Interface RepositoryInterface
+ * @codeCoverageIgnore
+ */
 interface RepositoryInterface
 {
     public function getAll();
