@@ -3,6 +3,9 @@
 ## ** Test specification ** 
 [Link of the test specification](https://github.com/felipedecampos/trivago-coding-challenge/docs/README.md)
 
+## ** Project BOARD (Kanban) **
+[Link to Kanban](https://github.com/felipedecampos/trivago-coding-challenge/projects/1)
+
 ## ** How to install the project environment **
 
 ### Linux (Debian 9):
