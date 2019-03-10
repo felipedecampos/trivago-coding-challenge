@@ -178,7 +178,7 @@ echo -e "\n"
 
 sed -i "s/{PROJECT_NAME}/$r_projectname/g" $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/laravel-cron
 
-read -p "Are you sure do you want to install the project [$r_projectname] y/n? [y]: " yn
+read -p "Are you sure you want to install the project [$r_projectname] y/n? [y]: " yn
 if [[ "$yn" != "n" ]]; then
 
     echo -e "\n"
@@ -283,7 +283,7 @@ if [[ "$yn" != "n" ]]; then
 
     echo -e "Project \e[32m$r_projectname\e[0m was successfully installed \n"
 
-    echo -e "Click the links below to access the projects: \n"
+    echo -e "Click the link below to access the project: \n"
 
     echo -e " \e[44mhttp://$appurl\e[0m\n"
 
