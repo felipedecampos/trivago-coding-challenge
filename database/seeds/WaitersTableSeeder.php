@@ -2,6 +2,7 @@
 
 use App\Models\Waiter;
 use App\Repositories\WaiterRepository;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Seeder;
 
 class WaitersTableSeeder extends Seeder
@@ -11,9 +12,15 @@ class WaitersTableSeeder extends Seeder
      */
     public $waiterRepo;
 
-    public function __construct(Waiter $waiter)
+    /**
+     * @var DatabaseManager
+     */
+    protected $db;
+
+    public function __construct(Waiter $waiter, DatabaseManager $db)
     {
         $this->waiterRepo = new WaiterRepository($waiter);
+        $this->db         = $db;
     }
 
     /**
@@ -25,6 +32,8 @@ class WaitersTableSeeder extends Seeder
     public function run()
     {
         try {
+
+            $this->db->beginTransaction();
 
             $this->waiterRepo->put([
                 'first_name' => 'Richard',
@@ -38,7 +47,11 @@ class WaitersTableSeeder extends Seeder
                 'available'  => false
             ]);
 
+            $this->db->commit();
+
         } catch (Exception $e) {
+
+            $this->db->rollBack();
 
             throw $e;
 
