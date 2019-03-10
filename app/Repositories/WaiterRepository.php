@@ -33,15 +33,17 @@ class WaiterRepository implements RepositoryInterface
 
     public function put($waiter)
     {
-        $model = $this->waiter->find($waiter['id']);
+        if (isset($waiter['id'])) {
+            $model = $this->waiter->find($waiter['id']);
+        }
 
-        $waiterModel = is_null($model)
+        $waiterModel = ! isset($model)
             ? new Waiter()
             : $model;
 
         $waiterModel->fill($waiter);
 
-        if (is_null($model)) {
+        if (isset($waiter['id'])) {
             $waiterModel->setAttribute('id', $waiter['id']);
         }
 
