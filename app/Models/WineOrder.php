@@ -15,7 +15,7 @@ class WineOrder extends Model
     use SoftDeletes;
 
     protected $table      = 'wine_orders';
-    protected $primaryKey = 'order_id';
+    protected $primaryKey = ['order_id', 'wine_guid'];
     protected $fillable   = [
         'status',
         'order_id',

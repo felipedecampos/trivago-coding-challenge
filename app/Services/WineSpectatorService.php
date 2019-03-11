@@ -47,6 +47,9 @@ class WineSpectatorService
             $this->db->beginTransaction();
 
             foreach ($wines as $wine) {
+                $guid = explode("/", $wine['guid']); // @todo: remove before deploy
+                if (end($guid) == '15368') continue; // @todo: remove before deploy
+
                 $status = $this->wineSpectatorRepository->put($wine);
 
                 if (true !== $status) {
@@ -68,7 +71,7 @@ class WineSpectatorService
             throw $e;
 
         }
-
+die('died');
         return true;
     }
 
