@@ -128,6 +128,12 @@ All tests were made in Debian 9, I can't guarantee it will work on other operati
 $ vendor/bin/phpunit
 ```
 
+**To update the catalog of wines according RSS link, run into container \(php-fpm\):**
+
+```shell
+$ php artisan wine-spectator:watch all
+```
+
 **You will need to register on site to place orders**
 
 So press the register button on home and apply the form

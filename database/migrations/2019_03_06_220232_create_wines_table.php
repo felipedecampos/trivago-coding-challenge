@@ -14,7 +14,7 @@ class CreateWinesTable extends Migration
     public function up()
     {
         Schema::create('wines', function (Blueprint $table) {
-            $table->longText('guid')->unique();
+            $table->string('guid', 255)->unique();
             $table->string('variety');
             $table->string('region');
             $table->year('year');

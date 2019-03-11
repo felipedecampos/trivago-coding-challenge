@@ -254,8 +254,6 @@ if [[ "$yn" != "n" ]]; then
 
     docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan key:generate"
 
-    chown $USER:$USER -R $projectpath
-
     chmod 777 $(find ../storage/ -not -name ".gitignore")
     chmod 777 $(find ../bootstrap/cache/ -not -name ".gitignore")
 
