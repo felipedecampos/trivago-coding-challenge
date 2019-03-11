@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 
 use App\Models\Order;
-use App\Models\Wine;
 use App\Models\WineOrder;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
 
@@ -24,14 +23,16 @@ class OrderRepository implements RepositoryInterface
      */
     public $wineOrder;
 
-    function __construct(Order $order) {
+    function __construct(Order $order, WineOrder $wineOrder) {
         $this->order     = $order;
+        $this->wineOrder = $wineOrder;
     }
 
     public function getAll()
     {
         return $this->order->where('user_id', '=', auth()->user()->getAuthIdentifier())
             ->with('wine_order')
+            ->with('waiter')
             ->get();
     }
 
@@ -40,11 +41,9 @@ class OrderRepository implements RepositoryInterface
         return $this->order->query()->with('wineOrder')->find($id);
     }
 
-    public function put(WineOrder $wineOrder, $orderForm)
+    public function put($orderForm)
     {
         $status = [];
-
-        $this->wineOrder = $wineOrder;
 
         if (isset($orderForm['id'])) {
             $this->order = $this->find($orderForm['id']) ?? new Order();
@@ -69,18 +68,17 @@ class OrderRepository implements RepositoryInterface
         $orderId = $this->order->getAttribute('id');
 
         foreach ($wines as $wine) {
-            if (isset($wine['guid']) && isset($orderId)) {
-                $this->wineOrder = $wineOrder->where('order_id', '=', $orderId)->where('wine_guid', '=', $wine['guid'])
-                    ?? new WineOrder();
-            }
+            $query = $this->wineOrder->query()
+                ->where('order_id', '=', $orderId)
+                ->where('wine_guid', '=', $wine);
 
-            $wineOrder = ['order_id' => $orderId] + $wine;
+            $this->wineOrder = $query->exists()
+                    ? $query->first()
+                    : new WineOrder();
+
+            $wineOrder = ['order_id' => $orderId] + ['wine_guid' => $wine];
 
             $this->wineOrder->fill($wineOrder);
-
-            if (isset($orderForm['id'])) {
-                $this->wineOrder->setAttribute('id', $orderForm['id']);
-            }
 
             $status[] = $this->wineOrder->save();
         }

@@ -3,18 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\OrderRepository;
+use App\Services\WaiterService;
 use App\Services\WineSpectatorService;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class OrderController extends Controller
 {
     /**
      * @var OrderRepository
      */
-    public $orderRepo;
+    protected $orderRepo;
 
-    public function __construct(OrderRepository $orderRepo)
+    /**
+     * @var DatabaseManager
+     */
+    protected $db;
+
+    public function __construct(DatabaseManager $db, OrderRepository $orderRepo)
     {
+        $this->db        = $db;
         $this->orderRepo = $orderRepo;
     }
 
@@ -34,20 +43,13 @@ class OrderController extends Controller
      * Show the form for creating a new resource.
      *
      * @param WineSpectatorService $wineSpectatorService
+     * @param WaiterService $waiterService
      * @return \Illuminate\Http\Response
      */
-    public function create(WineSpectatorService $wineSpectatorService)
+    public function create(WineSpectatorService $wineSpectatorService, WaiterService $waiterService)
     {
-        $wines = $wineSpectatorService->getAll();
-
-//        echo "<pre>";
-//        print_r($wines);
-//        die('died');
-
-        $waiters = [
-            ['first_name' => 'Richard', 'last_name'  => 'Goodman', 'available'  => false],
-            ['first_name' => 'Paul', 'last_name'  => 'Priestly', 'available'  => false]
-        ];
+        $wines   = $wineSpectatorService->getAll();
+        $waiters = $waiterService->getAllAvailable();
 
         return view('order.create', ['orders' => $waiters, 'wines' => $wines]);
     }
@@ -55,56 +57,44 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request $request
+     * @param OrderRepository $orderRepository
+     * @return bool
+     * @throws \Exception
      */
-    public function store(Request $request)
+    public function store(Request $request, OrderRepository $orderRepository)
     {
-        //
-    }
+        try {
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+            $this->db->beginTransaction();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+            $order = $request->all();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+            unset($order['_token']);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+            $status = $orderRepository->put($order);
+
+            if (true !== $status) {
+                $exceptionMessage = sprintf(
+                    'Could not save the order: %s',
+                    print_r($order, true)
+                );
+
+                throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
+            }
+
+            $this->db->commit();
+
+        } catch (\Exception $e) {
+
+            $this->db->rollBack();
+
+            throw $e;
+
+        }
+
+        \Session::flash('status','Order successfully placed.');
+
+        return redirect()->route('orders.index');
     }
 }

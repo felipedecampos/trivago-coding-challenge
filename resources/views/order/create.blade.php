@@ -29,29 +29,34 @@
                         <form method="post" action="{{ route('orders.store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
-                                <div class="col-md-4"></div>
-                                <div class="form-group col-md-4">
-                                    <lable>Wine</lable>
-                                    <select name="wine_order[]">
-                                        @foreach($wines as $wine)
-                                            <option value="{{ $wine->guid }}">{{ $wine->guid }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <lable> <strong>Wine:</strong> <br>
+                                        <select name="wines[]" multiple style="height:150px;">
+                                            @foreach($wines as $wine)
+                                                <option
+                                                    value="{{ $wine->link }}"
+                                                    available="@if(new \DateTime('today', new \DateTimeZone('-05:00')) == new \DateTime($wine->pub_date)){{ '1' }}@else{{ '0' }}@endif"
+                                                >
+                                                    {{ strtoupper($wine->variety) }}
+                                                    {{ $wine->region }}
+                                                    {{ $wine->year }}
+                                                    ${{ $wine->price }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </lable>
+                                </div>
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <lable> <strong>Waiter:</strong> <br>
+                                        <select name="waiter_id">
+                                            <option value="1">Richard</option>
+                                            <option value="2">Paul</option>
+                                        </select>
+                                    </lable>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4"></div>
-                                <div class="form-group col-md-4">
-                                    <lable>Waiter</lable>
-                                    <select name="office">
-                                        <option value="1">Richard</option>
-                                        <option value="2">Paul</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4"></div>
-                                <div class="form-group col-md-4" style="margin-top:60px">
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center mt-5">
                                     <button type="submit" class="btn btn-success">Submit</button>
                                 </div>
                             </div>

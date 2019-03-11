@@ -25,16 +25,19 @@
                             </div>
                         @endif
 
-                        @foreach($orders as $orderKey => $order)
+                        @forelse($orders as $orderKey => $order)
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="row m-0">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="row">
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left">
-                                                    Order: {{ $orderKey+1 }}
+                                            <div class="row bg-warning">
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-left">
+                                                    Order: {{ (new \DateTime($order->created_at))->format('Y-m-d H:i:s') }}
                                                 </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-right">
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-center">
+                                                    Waiter: {{ $order->waiter->first_name }} {{ $order->waiter->last_name }}
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
                                                     Status: {{ $order->status }}
                                                 </div>
                                             </div>
@@ -44,10 +47,10 @@
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             @foreach($order->wine_order as $wineKey => $wines)
                                                 <div class="row">
-                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left">
-                                                        Item: {{ $wineKey }}
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-right bg-info">
+                                                        Item: {{ $wineKey+1 }}
                                                     </div>
-                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left bg-info">
                                                         Status: {{ $wines->pivot->status }}
                                                     </div>
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left">
@@ -65,7 +68,9 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            {{ 'You don\'t have any order placed yet!' }}
+                        @endforelse
                     </div>
                 </div>
             </div>

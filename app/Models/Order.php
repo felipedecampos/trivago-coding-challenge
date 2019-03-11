@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -45,6 +46,15 @@ class Order extends Model
         {
             $order->wine_order()->delete();
         });
+    }
+
+    /**
+     * Retrieve waiter of this order
+     * @return HasOne
+     */
+    public function waiter()
+    {
+        return $this->hasOne(Waiter::class, 'id', 'waiter_id');
     }
 
     /**
