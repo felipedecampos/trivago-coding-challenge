@@ -136,8 +136,8 @@ showNetwork()
     clear
 
     if source ./.env; then
-        if [[ -n $(sudo docker network ls --filter name="$NETWORK_NAME" --quiet) ]]; then
-            sudo docker network inspect $(sudo docker network ls --filter name="$NETWORK_NAME" --quiet)
+        if [[ -n $(docker network ls --filter name="$NETWORK_NAME" --quiet) ]]; then
+            docker network inspect $(docker network ls --filter name="$NETWORK_NAME" --quiet)
         elif [[ -n "$NETWORK_NAME" && "$NETWORK_NAME" != "{NETWORK_NAME}" ]]; then
             echo -e "Network set up: \e[32m$NETWORK_NAME\e[0m > \e[32m$NETWORK_IP\e[0m";
         else
@@ -234,7 +234,7 @@ inArray () {
 
 showUsedIps()
 {
-    networks=($(sudo docker network ls | grep -v -e "host" -e "none" | awk '{ if(NR>1) print $2 }'))
+    networks=($(docker network ls | grep -v -e "host" -e "none" | awk '{ if(NR>1) print $2 }'))
 
     old="$IFS"
     IFS="|"
@@ -244,8 +244,8 @@ showUsedIps()
 
     declare -ga foundBaseIpNetworks
 
-    foundNetworks=($(sudo docker network inspect --format="{{ range .IPAM.Config }}{{ .Subnet }}{{end}}" $(sudo docker network ls --filter name="${findNetworks}" -q) | sed -e 's/\/.*//g'))
-    foundBaseIpNetworks=($(sudo docker network inspect --format="{{ range .IPAM.Config }}{{ .Subnet }}{{end}}" $(sudo docker network ls --filter name="${findNetworks}" -q) | sed -e 's/\..*//g'))
+    foundNetworks=($(docker network inspect --format="{{ range .IPAM.Config }}{{ .Subnet }}{{end}}" $(docker network ls --filter name="${findNetworks}" -q) | sed -e 's/\/.*//g'))
+    foundBaseIpNetworks=($(docker network inspect --format="{{ range .IPAM.Config }}{{ .Subnet }}{{end}}" $(docker network ls --filter name="${findNetworks}" -q) | sed -e 's/\..*//g'))
 
     if [[ "${#foundNetworks[@]}" != "0" ]]; then
         printf "Don't use the following IPs, they are already in use:\n"

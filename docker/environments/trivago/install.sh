@@ -183,29 +183,11 @@ if [[ "$yn" != "n" ]]; then
 
     echo -e "\n"
 
-    sudo docker-compose -f $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml --project-name "$r_projectname" up -d --force-recreate --build --remove-orphans
-
-    etchosts=/etc/hosts
-    hostsline="$nginxhost\t$appurl"
-
-    if [ -n "$(grep $appurl $etchosts)" ]
-        then
-            echo -e "$appurl already exists in $etchosts: $(grep $appurl $etchosts)\n"
-        else
-            echo -e "Adding $appurl to your $etchosts\n";
-            sudo -- sh -c -e "echo '$hostsline' >> $etchosts";
-
-            if [ -n "$(grep $appurl $etchosts)" ]
-                then
-                    echo -e "$appurl was added succesfully in $etchosts \n $(grep $appurl $etchosts)";
-                else
-                    echo -e "Failed to Add $appurl in $etchosts, Try again!\n";
-            fi
-    fi
+    docker-compose -f $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml --project-name "$r_projectname" up -d --force-recreate --build --remove-orphans
 
     cp $projectpath/.env.example $projectpath/.env
 
-    sudo docker exec --user docker $r_projectname-php-fpm php -r "file_put_contents('$r_projectname/.env', str_replace([
+    docker exec --user docker $r_projectname-php-fpm php -r "file_put_contents('$r_projectname/.env', str_replace([
         'APP_NAME=Laravel',
         'APP_URL=http://localhost',
         'DB_CONNECTION=mysql',
@@ -253,7 +235,7 @@ if [[ "$yn" != "n" ]]; then
             smptpass="null"
         fi
 
-        sudo docker exec --user docker $r_projectname-php-fpm php -r "file_put_contents('$r_projectname/.env', str_replace([
+        docker exec --user docker $r_projectname-php-fpm php -r "file_put_contents('$r_projectname/.env', str_replace([
             'MAIL_HOST=mailtrap.io',
             'MAIL_PORT=2525',
             'MAIL_USERNAME=null',
@@ -268,18 +250,41 @@ if [[ "$yn" != "n" ]]; then
         ], file_get_contents('$r_projectname/.env')));"
     fi
 
-    sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && composer install"
+    docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && composer install"
 
-    sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan key:generate"
+    docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan key:generate"
 
-    sudo chown $USER:$USER -R $projectpath
+    chown $USER:$USER -R $projectpath
 
-    sudo chmod 777 $(find ../storage/ -not -name ".gitignore")
-    sudo chmod 777 $(find ../bootstrap/cache/ -not -name ".gitignore")
+    chmod 777 $(find ../storage/ -not -name ".gitignore")
+    chmod 777 $(find ../bootstrap/cache/ -not -name ".gitignore")
 
-    sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan migrate:refresh --seed"
+    docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan migrate:refresh --seed"
 
-    sudo docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan wine-spectator:watch all"
+    docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan wine-spectator:watch all"
+
+    read -p "Do you want to add the project host on your /etc/hosts file? (warning: This command needs the sudo privilege) y/n? [n]: " yn
+    if [[ "$yn" = "y" ]]; then
+        etchosts=/etc/hosts
+        hostsline="$nginxhost\t$appurl"
+
+        if [ -n "$(grep $appurl $etchosts)" ]
+            then
+                echo -e "$appurl already exists in $etchosts: $(grep $appurl $etchosts)\n"
+            else
+                echo -e "Adding $appurl to your $etchosts\n";
+                sudo -- sh -c -e "echo '$hostsline' >> $etchosts";
+
+                if [ -n "$(grep $appurl $etchosts)" ]
+                    then
+                        echo -e "$appurl was added succesfully in $etchosts \n $(grep $appurl $etchosts)";
+                    else
+                        echo -e "Failed to Add $appurl in $etchosts, Try again!\n";
+                fi
+        fi
+    else
+        echo -e "Please, put in your $etchosts file the host of this project: $hostsline\n"
+    fi
 
     echo -e "Project \e[32m$r_projectname\e[0m was successfully installed \n"
 

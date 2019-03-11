@@ -1,7 +1,7 @@
 # Coding challenge - Be the owner of a winery
 
 ## ** Test specification ** 
-[Link of the test specification](https://github.com/felipedecampos/trivago-coding-challenge/docs/README.md)
+[Link of the test specification](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs)
 
 ## ** Project BOARD (Kanban) **
 [Link to Kanban](https://github.com/felipedecampos/trivago-coding-challenge/projects/1)
@@ -19,13 +19,13 @@
 To know your docker version run:
 
 ```shell
-$ sudo docker-compose -v
+$ docker -v
 ```
 
 To know your docker-composer version run:
 
 ```shell
-$ sudo docker-compose -v
+$ docker-compose -v
 ```
 
 To know your git version run:
@@ -121,3 +121,16 @@ The installer helper will install the project environment with docker-compose
 All tests were made in Debian 9, I can't guarantee it will work on other operating systems
 
 ## ** What has been done **
+
+**To test the application go to the project folder and run tests:**
+
+```shell
+$ vendor/bin/phpunit
+```
+
+**You will need to register on site to place orders**
+
+So press the register button on home and apply the form
+
+###### I'm not finished yet :// 
+###### I will need some extra time.
