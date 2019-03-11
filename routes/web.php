@@ -14,3 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', function (){ return redirect('orders'); });
+
+Route::middleware('auth')->group(function () {
+    Route::resources(['orders' => 'OrderController']);
+});

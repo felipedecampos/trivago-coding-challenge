@@ -23,7 +23,11 @@ class WineSpectatorRepository implements RepositoryInterface
 
     public function getAll()
     {
-        return $this->wine->all();
+        return $this->wine->query()
+            ->orderBy('variety', 'ASC')
+            ->orderBy('year', 'ASC')
+            ->orderBy('price', 'ASC')
+            ->get();
     }
 
     public function find($id)
