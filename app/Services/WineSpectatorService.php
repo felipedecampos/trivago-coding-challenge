@@ -157,4 +157,9 @@ class WineSpectatorService
 
         return $parsed;
     }
+
+    public function getAll()
+    {
+        return $this->wineSpectatorRepository->getAll();
+    }
 }

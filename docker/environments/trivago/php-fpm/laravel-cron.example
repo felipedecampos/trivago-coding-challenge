@@ -1,1 +1,1 @@
-* * * * * root cd /var/www/{PROJECT_NAME} && php artisan schedule:run >> /dev/null 2>&1
+* * * * * docker php /var/www/{PROJECT_NAME}/artisan schedule:run >> /dev/null 2>&1

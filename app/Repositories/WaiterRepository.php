@@ -23,7 +23,19 @@ class WaiterRepository implements RepositoryInterface
 
     public function getAll()
     {
-        return $this->waiter->all();
+        return $this->waiter->query()
+            ->orderBy('first_name', 'ASC')
+            ->orderBy('last_name', 'ASC')
+            ->get();
+    }
+
+    public function getAllAvailable()
+    {
+        return $this->waiter->query()
+            ->where('available', '=', true)
+            ->orderBy('first_name', 'ASC')
+            ->orderBy('last_name', 'ASC')
+            ->get();
     }
 
     public function find($id)
