@@ -24,28 +24,31 @@ if [[ "$yn" = "y" ]]; then
     echo -e "\e[0m"
 
     # DESTROYING CONTAINERS, VOLUMES, IMAGES, NETWORKS
-    sudo docker-compose -f $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml down --volumes --rmi all --remove-orphans
+    docker-compose -f $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml down --volumes --rmi all --remove-orphans
 
     echo -e "\n"
 
     # REMOVING HOSTS
-    etchosts=/etc/hosts
+    read -p "Do you want to remove the project host on your /etc/hosts file? (warning: This command needs the sudo privilege) y/n? [n]: " yn
+    if [[ "$yn" = "y" ]]; then
+        etchosts=/etc/hosts
 
-    if [[ -n "$(grep "$APP_URL" $etchosts)" ]]; then
-        if [[ -n $(sudo sed "/$APP_URL/d" /etc/hosts) ]]; then
-            echo "$APP_URL was removed successfully from $etchosts";
+        if [[ -n "$(grep "$APP_URL" $etchosts)" ]]; then
+            if [[ -n $(sudo sed "/$APP_URL/d" /etc/hosts) ]]; then
+                echo "$APP_URL was removed successfully from $etchosts";
+            else
+                echo "Failed to remove $APP_URL from $etchosts, Try again!";
+            fi
         else
-            echo "Failed to remove $APP_URL from $etchosts, Try again!";
+            echo "Host ($APP_URL) has already been removed from $etchosts: $(grep $APP_URL $etchosts)"
         fi
-    else
-        echo "Host ($APP_URL) has already been removed from $etchosts: $(grep $APP_URL $etchosts)"
-    fi
 
-    echo -e "\n"
+        echo -e "\n"
+    fi
 
     read -p "Do you want to remove the project repository (notice: There is no way to undo this) y/n? [n]: " yn
     if [[ "$yn" = "y" ]]; then
-        sudo rm -rf $PROJECT_PATH
+        rm -rf $PROJECT_PATH
     fi
 
     echo -e "\n"

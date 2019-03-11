@@ -28,8 +28,7 @@ RUN npm install -g npm
 
 # Add crontab file in the cron directory
 COPY ./laravel-cron /etc/cron.d/laravel-cron
-
-ADD ./laravel-cron /var/spool/cron/crontabs/root
+COPY ./laravel-cron /var/spool/cron/crontabs/root
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/laravel-cron
