@@ -8,7 +8,7 @@
 
 ## ** How to install the project environment **
 
-### Linux (Debian 9):
+### Linux:
 
 #### requirements:
 

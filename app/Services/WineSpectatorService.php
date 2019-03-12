@@ -44,12 +44,11 @@ class WineSpectatorService
 
             $wines = $this->fetchWines($dateTime);
 
+            dd($wines);
+
             $this->db->beginTransaction();
 
             foreach ($wines as $wine) {
-                $guid = explode("/", $wine['guid']); // @todo: remove before deploy
-                if (end($guid) == '15368') continue; // @todo: remove before deploy
-
                 $status = $this->wineSpectatorRepository->put($wine);
 
                 if (true !== $status) {
@@ -71,7 +70,7 @@ class WineSpectatorService
             throw $e;
 
         }
-die('died');
+
         return true;
     }
 
@@ -94,7 +93,7 @@ die('died');
             $wine['pub_date'] = $wine['pubDate'];
 
             unset(
-                $wine['title'],
+//                $wine['title'],
                 $wine['description'],
                 $wine['author'],
                 $wine['category'],
@@ -134,31 +133,18 @@ die('died');
      */
     private function parseTitle(string $title): array
     {
-        $exprVariety = '([[:upper:]]{2,})';
-        $exprRegion  = '\b(?!Spectator|Wine)\b([A-Z]{0,1}[a-z]+)';
-        $exprYear    = '(\d{4,4})';
-        $exprPrice   = '(\$\d+\.\d+|\$\d+)';
-        $exprAll     = "/$exprVariety|$exprRegion|$exprYear|$exprPrice/";
-        preg_match_all($exprAll, $title, $matches);
+        $regex_all = '/^([\'A-ZÁÂÀÅÃÄÆÉÊÈËÐÍÎÌÏÓÔÒØÕÖÚÛÙÜÇÑÝ ]+)([\'A-ZÁÂÀÅÃÄÆÉÊÈËÐÍÎÌÏÓÔÒØÕÖÚÛÙÜÇÑÝ ]+.+)(\d{4})([^\\$]+\\$[^(]+)\\(([^)]+)\\)/';
 
-        unset($exprVariety, $exprRegion, $exprYear, $exprPrice, $exprAll, $matches[0]);
+        if(! preg_match($regex_all, $title, $matches)):
+            return array();
+        endif;
 
-        $parsed = [];
-        $keys   = [null, 'variety', 'region', 'year', 'price'];
-
-        foreach ($matches as $key => $match) {
-            $parsed[$keys[$key]] = implode(' ', array_filter($match));
-
-            if ($key === 4) {
-                $parsed[$keys[$key]] = (double) str_replace('$', '', $parsed[$keys[$key]]);
-            }
-
-            unset($matches[$key]);
-        }
-
-        unset($keys);
-
-        return $parsed;
+        return [
+            'variety' => trim($matches[1]),
+            'region'  => trim($matches[2]),
+            'year'    => trim($matches[3]),
+            'price'   => (double) str_replace('$', '', trim($matches[4]))
+        ];
     }
 
     public function getAll()
