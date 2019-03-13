@@ -2,11 +2,15 @@
 
 namespace App\Providers;
 
+use App\Repositories\OrderRepository;
 use App\Repositories\WaiterRepository;
 use App\Repositories\WineSpectatorRepository;
+use App\Services\OrderService;
 use App\Services\WaiterService;
 use App\Services\WineSpectatorService;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +36,13 @@ class AppServiceProvider extends ServiceProvider
                 $app->get(WaiterRepository::class)
             );
         });
+
+        $this->app->singleton(OrderService::class, function (Application $app): OrderService {
+            return new OrderService(
+                $app->get('db'),
+                $app->get(OrderRepository::class)
+            );
+        });
     }
 
     /**
@@ -41,6 +52,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        DB::listen(function($query) {
+            Log::info(
+                $query->sql,
+                $query->bindings,
+                $query->time
+            );
+        });
     }
 }

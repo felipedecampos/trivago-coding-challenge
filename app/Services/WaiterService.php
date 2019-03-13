@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Repositories\OrderRepository;
 use App\Repositories\WaiterRepository;
 use Illuminate\Database\DatabaseManager;
 
@@ -15,7 +16,7 @@ class WaiterService
     /**
      * @var WaiterRepository
      */
-    public $waiterRepo;
+    protected $waiterRepo;
 
     public function __construct(DatabaseManager $db, WaiterRepository $waiterRepo) {
         $this->waiterRepo = $waiterRepo;
@@ -30,5 +31,12 @@ class WaiterService
     public function getAllAvailable()
     {
         return $this->waiterRepo->getAllAvailable();
+    }
+
+    public function setOneAvailableWaiter()
+    {
+        $this->waiterRepo->setOneAvailableWaiter();
+
+        return $this;
     }
 }

@@ -38,6 +38,17 @@ class WaiterRepository implements RepositoryInterface
             ->get();
     }
 
+    public function setOneAvailableWaiter()
+    {
+        $availableWaiters = $this->getAllAvailable();
+
+        $this->waiter = $availableWaiters->count()
+            ? $availableWaiters->offsetGet(array_rand($availableWaiters->toArray()) ?? null) ?? null
+            : null;
+
+        return $this->waiter;
+    }
+
     public function find($id)
     {
         return $this->waiter->find($id);

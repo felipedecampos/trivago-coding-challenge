@@ -15,7 +15,7 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->enum('status', ['open', 'closed'])->default('open');
+            $table->enum('status', ['open', 'preparing', 'closed'])->default('open');
             $table->integer('user_id')->unsigned()->index()->nullable();
             $table->integer('waiter_id')->unsigned()->index()->nullable();
             $table->integer('sommelier_id')->unsigned()->index()->nullable();

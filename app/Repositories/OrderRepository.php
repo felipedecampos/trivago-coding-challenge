@@ -6,6 +6,7 @@ namespace App\Repositories;
 use App\Models\Order;
 use App\Models\WineOrder;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Class OrderRepository
@@ -38,7 +39,7 @@ class OrderRepository implements RepositoryInterface
 
     public function find($id)
     {
-        return $this->order->query()->with('wineOrder')->find($id);
+        return $this->order->query()->with('wine_order')->find($id);
     }
 
     public function put($orderForm)
@@ -91,5 +92,21 @@ class OrderRepository implements RepositoryInterface
         $order = $this->order->find($id);
 
         return $order->delete();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     */
+    public function getNextOrder()
+    {
+        return $this->order->query()
+            ->with('wine_order')
+            ->with('waiter')
+            ->whereHas('waiter', function($q){
+                $q->where('available', '=', true);
+            })
+            ->where('status', '=', 'open')
+            ->orderBy('id' ,'ASC')
+            ->first();
     }
 }

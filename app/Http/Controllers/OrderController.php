@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessOrder;
 use App\Repositories\OrderRepository;
+use App\Services\OrderService;
 use App\Services\WaiterService;
 use App\Services\WineSpectatorService;
 use Illuminate\Database\DatabaseManager;
@@ -12,14 +14,14 @@ use Illuminate\Http\Response;
 class OrderController extends Controller
 {
     /**
-     * @var OrderRepository
-     */
-    protected $orderRepo;
-
-    /**
      * @var DatabaseManager
      */
     protected $db;
+
+    /**
+     * @var OrderRepository
+     */
+    protected $orderRepo;
 
     public function __construct(DatabaseManager $db, OrderRepository $orderRepo)
     {
@@ -59,10 +61,11 @@ class OrderController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param OrderRepository $orderRepository
+     * @param OrderService $orderService
      * @return bool
      * @throws \Exception
      */
-    public function store(Request $request, OrderRepository $orderRepository)
+    public function store(Request $request, OrderRepository $orderRepository, OrderService $orderService)
     {
         try {
 
@@ -83,7 +86,10 @@ class OrderController extends Controller
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
-            $this->db->commit();
+//            ProcessOrder::dispatch($orderRepository);
+            ProcessOrder::dispatchNow($orderService);
+            $this->db->rollBack();
+//            $this->db->commit();
 
         } catch (\Exception $e) {
 

@@ -15,7 +15,6 @@ class Waiter extends Model
 
     protected $table      = 'waiters';
     protected $primaryKey = 'id';
-    protected $hidden     = ['id'];
     protected $fillable   = [
         'first_name',
         'last_name',
