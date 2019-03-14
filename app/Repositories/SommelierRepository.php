@@ -23,7 +23,28 @@ class SommelierRepository implements RepositoryInterface
 
     public function getAll()
     {
-        return $this->sommelier->all();
+        return $this->sommelier->query()
+            ->orderBy('first_name', 'ASC')
+            ->orderBy('last_name', 'ASC')
+            ->get();
+    }
+
+    public function getAllAvailable()
+    {
+        return $this->sommelier->query()
+            ->where('available', '=', true)
+            ->orderBy('first_name', 'ASC')
+            ->orderBy('last_name', 'ASC')
+            ->get();
+    }
+
+    public function getOneAvailable()
+    {
+        $available = $this->getAllAvailable();
+
+        return $available->count()
+            ? $available->offsetGet(array_rand($available->toArray()) ?? null) ?? null
+            : null;
     }
 
     public function find($id)
@@ -53,5 +74,28 @@ class SommelierRepository implements RepositoryInterface
     public function delete($id)
     {
         return $this->sommelier->find($id)->delete();
+    }
+
+    private function setAvailability(int $id, bool $availability)
+    {
+        $this->sommelier = $this->find($id);
+
+        if (is_null($this->sommelier)) {
+            return false;
+        }
+
+        $this->sommelier->available = $availability;
+
+        return $this->sommelier->save();
+    }
+
+    public function setUnavailable($id)
+    {
+        return $this->setAvailability($id, false);
+    }
+
+    public function setAvailable(int $id)
+    {
+        return $this->setAvailability($id, true);
     }
 }

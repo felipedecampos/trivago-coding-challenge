@@ -4,9 +4,10 @@ namespace App\Repositories;
 
 
 use App\Models\Order;
+use App\Models\Sommelier;
 use App\Models\WineOrder;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
-use phpDocumentor\Reflection\Types\Integer;
+use Illuminate\Http\Response;
 
 /**
  * Class OrderRepository
@@ -52,7 +53,7 @@ class OrderRepository implements RepositoryInterface
 
         $order = ['user_id' => auth()->user()->getAuthIdentifier()];
 
-        $wines = $orderForm['wines'];
+        $wines = $orderForm['wines'] ?? [];
 
         unset($orderForm['wines']);
 
@@ -68,20 +69,22 @@ class OrderRepository implements RepositoryInterface
 
         $orderId = $this->order->getAttribute('id');
 
-        foreach ($wines as $wine) {
-            $query = $this->wineOrder->query()
-                ->where('order_id', '=', $orderId)
-                ->where('wine_guid', '=', $wine);
+        if (count($wines)) {
+            foreach ($wines as $wine) {
+                $query = $this->wineOrder->query()
+                    ->where('order_id', '=', $orderId)
+                    ->where('wine_guid', '=', $wine);
 
-            $this->wineOrder = $query->exists()
+                $this->wineOrder = $query->exists()
                     ? $query->first()
                     : new WineOrder();
 
-            $wineOrder = ['order_id' => $orderId] + ['wine_guid' => $wine];
+                $wineOrder = ['order_id' => $orderId] + ['wine_guid' => $wine];
 
-            $this->wineOrder->fill($wineOrder);
+                $this->wineOrder->fill($wineOrder);
 
-            $status[] = $this->wineOrder->save();
+                $status[] = $this->wineOrder->save();
+            }
         }
 
         return count(array_filter($status, function ($s){ return $s === true; })) === count($wines) + 1; // 1 = order
@@ -94,12 +97,9 @@ class OrderRepository implements RepositoryInterface
         return $order->delete();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
-     */
-    public function getNextOrder()
+    public function setNextOrderToProcess()
     {
-        return $this->order->query()
+        $this->order = $this->order->query()
             ->with('wine_order')
             ->with('waiter')
             ->whereHas('waiter', function($q){
@@ -108,5 +108,44 @@ class OrderRepository implements RepositoryInterface
             ->where('status', '=', 'open')
             ->orderBy('id' ,'ASC')
             ->first();
+
+        return ! is_null($this->order);
+    }
+
+    public function sendToSommelier(Sommelier $sommelier)
+    {
+        $this->order->fill([
+            'status'       => 'preparing',
+            'sommelier_id' => $sommelier->getAttribute('id')
+        ]);
+
+        return $this->order->save();
+    }
+
+    public function setNextOrderToPrepare()
+    {
+        $this->order = $this->order->query()
+            ->with('wine_order')
+            ->with('sommelier')
+            ->whereHas('sommelier', function($q){
+                $q->where('available', '=', true);
+            })
+            ->where('status', '=', 'preparing')
+            ->orderBy('id' ,'ASC')
+            ->first();
+
+        return ! is_null($this->order);
+    }
+
+    public function checkAvailabilityOfWines()
+    {
+        $this->order->wine_order->map(function (&$item) {
+            $today   = new \DateTime('now', new \DateTimeZone('-05:00'));
+            $pubDate = new \DateTime($item->pub_date);
+
+            $item->pivot->status = $pubDate != $today ? 'unavailable' : 'delivered';
+        });
+
+        return $this->order->save();
     }
 }

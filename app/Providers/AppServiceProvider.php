@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Repositories\OrderRepository;
+use App\Repositories\SommelierRepository;
 use App\Repositories\WaiterRepository;
 use App\Repositories\WineSpectatorRepository;
 use App\Services\OrderService;
@@ -40,7 +41,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(OrderService::class, function (Application $app): OrderService {
             return new OrderService(
                 $app->get('db'),
-                $app->get(OrderRepository::class)
+                $app->get(OrderRepository::class),
+                $app->get(WaiterRepository::class),
+                $app->get(SommelierRepository::class)
             );
         });
     }

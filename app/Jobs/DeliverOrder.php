@@ -2,16 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Repositories\OrderRepository;
 use App\Services\OrderService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Log;
 
-class ProcessOrder implements ShouldQueue
+class DeliverOrder implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -38,19 +36,8 @@ class ProcessOrder implements ShouldQueue
      */
     public function handle()
     {
-        if (true !== $this->orderService->processNextOrder()) {
+        if (true !== $this->orderService->prepareNextOrder()) {
 //            ProcessOrder::dispatch($orderService);
         }
-    }
-
-    /**
-     * The job failed to process.
-     *
-     * @param \Exception $e
-     * @return void
-     */
-    public function failed(\Exception $e)
-    {
-        LOG::error('Error (' . $e->getCode() . '): ' . $e->getMessage(), $e->getTrace());
     }
 }

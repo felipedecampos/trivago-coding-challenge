@@ -38,7 +38,7 @@ class SommeliersTableSeeder extends Seeder
             $this->sommelierRepo->put([
                 'first_name' => 'John',
                 'last_name'  => 'Shepherd',
-                'available'  => false
+                'available'  => true
             ]);
 
             $this->db->commit();
