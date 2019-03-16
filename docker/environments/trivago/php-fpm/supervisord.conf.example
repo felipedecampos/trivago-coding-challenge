@@ -43,14 +43,14 @@ priority=10
 user=docker
 numprocs=2
 redirect_stderr=true
-stdout_logfile=/var/www/{PROJECT_NAME}/storage/worker.log
+stdout_logfile=/var/www/{PROJECT_NAME}/storage/logs/worker.log
 
 [program:laravel-crontab]
 process_name=%(program_name)s_%(process_num)02d
 command=/etc/init.d/cron start
 autostart=true
 autorestart=true
-stdout_logfile=/var/www/{PROJECT_NAME}/storage/crontab.log
+stdout_logfile=/var/www/{PROJECT_NAME}/storage/logs/crontab.log
 
 [include]
 files = /etc/supervisor/conf.d/*.conf
