@@ -56,7 +56,9 @@
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left">
                                                         <p>
                                                             Variety: {{ $wines->title }}<br>
-                                                            Status: {{ $wines->status }}
+                                                            Link: <a href="{{ $wines->link }}" target="_blank">
+                                                                {{ $wines->link }}
+                                                            </a>
                                                         </p>
                                                     </div>
                                                 </div>
