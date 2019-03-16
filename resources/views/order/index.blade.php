@@ -67,7 +67,7 @@
                                                         $order->sommelier->first_name
                                                         ?? 'Waiting sommelier check the availibility of wines'
                                                     }}
-                                                    {{ $order->waiter->last_name ?? '' }}
+                                                    {{ $order->sommelier->last_name ?? '' }}
                                                 </div>
                                             </div>
                                         </div>

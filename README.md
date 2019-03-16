@@ -8,7 +8,7 @@
 
 ## ** How to install the project environment **
 
-### Linux:
+#### Linux:
 
 #### requirements:
 
@@ -116,27 +116,59 @@ $ cd docker && ./run.sh
 
 The installer helper will install the project environment with docker-compose
 
-### Windows and Macbook:
+#### Windows and Macbook:
 
 All tests were made in Debian 9, I can't guarantee it will work on other operating systems
 
-## ** What has been done **
+## ** Testing **
 
-**To test the application go to the project folder and run tests:**
-
+To test the application go to the project folder and run tests:
 ```shell
 $ vendor/bin/phpunit
 ```
 
-**To update the catalog of wines according RSS link, run into container \(php-fpm\):**
+## ** Logs **
 
+To “live” view the jobs log, run into container (php-fpm):
+```shell
+$ tail -f storage/logs/worker.log
+```
+
+To “live” view the crontab log, run into container (php-fpm):
+```shell
+$ tail -f storage/logs/crontab.log
+```
+
+To “live” view the application log, run into container (php-fpm):
+```shell
+$ tail -f storage/logs/laravel-DATE.log
+```
+
+
+
+## ** Wines catalog **
+
+Wines catalog according to RSS link will be updated everyday at 9AM with crontab set up. If you want to manually update all wines according to RSS link, run into container (php-fpm):
 ```shell
 $ php artisan wine-spectator:watch all
 ```
 
-**You will need to register on site to place orders**
+If you want to manually update only the wines available today according to RSS link, run into container (php-fpm):
+```shell
+$ php artisan wine-spectator:watch
+```
 
-So press the register button on home and apply the form
+## ** What has been done **
+You will need to register on site to place orders.
 
-###### I'm not finished yet :// 
-###### I will need some extra time.
+Press the Register button on home page. Enter your name, e-mail address, password, and confirm you password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
+
+You will be taken to the index page. To place an order, click the button + Place order. Select one or more wines from the list. The options in green are the available wines of the day (just to make easier testing the application).
+
+After selecting the wines, click Submit. You will be taken to the index page with your orders list. Your order status will be Open and each item status is displayed as Placed. Press F5 to refresh the page until your order status is updated to Closed. Jobs will be setup to be run every 5 seconds to make easier viewing jobs steps while testing the application.
+
+In the first job, you will be assigned an available waiter to process your order and send it to the sommelier to check the availability of the wines.
+
+In the last job, the waiter will deliver and close the order.
+
+After delivery of the order, your order status will change to Closed and your items will be displayed as Delivered or Unavailable according to sommelier’s response.
