@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\DeliverOrder;
-use App\Jobs\ProcessOrder;
+use App\Models\Order;
 use App\Repositories\OrderRepository;
 use App\Repositories\SommelierRepository;
 use App\Repositories\WaiterRepository;
@@ -39,27 +39,39 @@ class OrderService
         $this->sommelierRepo = $sommelierRepo;
     }
 
-    public function processNextOrder()
+    /**
+     * @param Order $order
+     * @return bool
+     * @throws \Exception
+     */
+    public function processNextOrder(Order $order)
     {
         try {
 
             $this->db->beginTransaction();
 
-            if (true !== $this->orderRepo->setNextOrderToProcess()) {
-                return false;
+            $this->orderRepo->order = $order;
+
+            $waiterId = $this->waiterRepo->getOneAvailable()->getAttribute('id') ?? null;
+
+            $this->waiterRepo->setUnavailable($waiterId);
+
+            $statusPreparation = $this->orderRepo->prepareOrder($waiterId);
+
+            if (true !== $statusPreparation) {
+                $exceptionMessage = sprintf(
+                    'Could not prepare the order: %s',
+                    print_r($this->orderRepo->order->getAttributes(), true)
+                );
+
+                throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
-            $waiter = $this->orderRepo->order->getAttribute('waiter_id');
+            $sommelierId = $this->sommelierRepo->getOneAvailable()->getAttribute('id') ?? null;
 
-            $this->waiterRepo->setUnavailable($waiter);
+            $statusSommelier = $this->orderRepo->sendToSommelier($sommelierId);
 
-            $status = $this->orderRepo->sendToSommelier($this->sommelierRepo->getOneAvailable());
-
-            DeliverOrder::dispatchNow($this);
-
-            $this->waiterRepo->setAvailable($waiter);
-
-            if (true !== $status) {
+            if (true !== $statusSommelier) {
                 $exceptionMessage = sprintf(
                     'Could not send the order to sommelier: %s',
                     print_r($this->orderRepo->order->getAttributes(), true)
@@ -67,6 +79,25 @@ class OrderService
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
+
+            $this->sommelierRepo->setUnavailable($sommelierId);
+
+            $statusAvailability = $this->orderRepo->processAvailabilityOfWines();
+
+            if (true !== $statusAvailability) {
+                $exceptionMessage = sprintf(
+                    'Could not process availability of wines: %s',
+                    print_r($this->orderRepo->order->getAttributes(), true)
+                );
+
+                throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
+            }
+
+            DeliverOrder::dispatch($this->orderRepo->order);
+
+            $this->sommelierRepo->setAvailable($sommelierId);
+
+            $this->waiterRepo->setAvailable($waiterId);
 
             $this->db->commit();
 
@@ -81,31 +112,24 @@ class OrderService
         return true;
     }
 
-    public function prepareNextOrder()
+    /**
+     * @param Order $order
+     * @return bool
+     * @throws \Exception
+     */
+    public function deliverOrder(Order $order)
     {
         try {
 
             $this->db->beginTransaction();
 
-            if (true !== $this->orderRepo->setNextOrderToPrepare()) {
-                return false;
-            }
+            $this->orderRepo->order = $order;
 
-            $sommelier = $this->orderRepo->order->getAttribute('sommelier_id');
-
-            $this->sommelierRepo->setUnavailable($sommelier);
-
-            $status = $this->orderRepo->checkAvailabilityOfWines();
-
-            dd($status, $this->orderRepo->order);
-
-            DeliverOrder::dispatchNow($this, 'deliveryToCustomer');
-
-            $this->sommelierRepo->setAvailable($sommelier);
+            $status = $this->orderRepo->deliverOrder();
 
             if (true !== $status) {
                 $exceptionMessage = sprintf(
-                    'Could not check the availability of wines: %s',
+                    'Could not deliver the order: %s',
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 

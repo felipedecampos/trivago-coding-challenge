@@ -26,12 +26,26 @@ RUN apt-get install -yq gcc g++ make
 # fix npm - not the latest version installed by apt-get
 RUN npm install -g npm
 
+#############
+## CRONTAB ##
+#############
+
 # Add crontab file in the cron directory
 COPY ./laravel-cron /etc/cron.d/laravel-cron
-COPY ./laravel-cron /var/spool/cron/crontabs/root
+COPY ./laravel-cron /var/spool/cron/crontabs/docker
 
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/laravel-cron
 RUN chmod +x /etc/cron.d/laravel-cron
+RUN chown docker:docker /etc/cron.d/laravel-cron
+RUN chown docker:docker /var/spool/cron/crontabs/docker
 
-RUN service cron start
+#############
+## QUEEUES ##
+#############
+
+# Install supervisor to manage queeues and crontab
+RUN apt-get install -y supervisor
+COPY ./supervisord.conf /etc/supervisor/supervisord.conf
+
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]

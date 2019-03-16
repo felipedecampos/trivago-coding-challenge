@@ -35,7 +35,7 @@
                                             @foreach($wines as $wine)
                                                 <option
                                                     value="{{ $wine->link }}"
-                                                    available="@if(new \DateTime('today', new \DateTimeZone('-05:00')) == new \DateTime($wine->pub_date)){{ '1' }}@else{{ '0' }}@endif"
+                                                    available="@if((new \DateTime('now', (new \DateTime($wine->pub_date))->getTimezone()))->format('Y-m-d') === (new \DateTime($wine->pub_date))->format('Y-m-d')){{ '1' }}@else{{ '0' }}@endif"
                                                 >
                                                     {{ $wine->title }}
                                                 </option>

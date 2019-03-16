@@ -2,12 +2,9 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Order;
-use App\Models\Sommelier;
 use App\Models\WineOrder;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
-use Illuminate\Http\Response;
 
 /**
  * Class OrderRepository
@@ -36,6 +33,7 @@ class OrderRepository implements RepositoryInterface
             ->with('wine_order')
             ->with('waiter')
             ->with('sommelier')
+            ->orderBy('id', 'DESC')
             ->get();
     }
 
@@ -87,9 +85,7 @@ class OrderRepository implements RepositoryInterface
                 $status[] = $this->wineOrder->save();
             }
         }
-echo "<pre>";
-var_dump($status);
-die('died');
+
         return count(array_filter($status, function ($s){ return $s === true; })) === count($wines) + 1; // 1 = order
     }
 
@@ -100,54 +96,45 @@ die('died');
         return $order->delete();
     }
 
-    public function setNextOrderToProcess()
-    {
-        $this->order = $this->order->query()
-            ->with('wine_order')
-            ->with('waiter')
-            ->whereHas('waiter', function($q){
-                $q->where('available', '=', true);
-            })
-            ->where('status', '=', 'open')
-            ->orderBy('id' ,'ASC')
-            ->first();
-
-        return ! is_null($this->order);
-    }
-
-    public function sendToSommelier(Sommelier $sommelier)
+    public function prepareOrder(int $waiterId)
     {
         $this->order->fill([
-            'status'       => 'preparing',
-            'sommelier_id' => $sommelier->getAttribute('id')
+            'status'    => 'preparing',
+            'waiter_id' => $waiterId
         ]);
 
         return $this->order->save();
     }
 
-    public function setNextOrderToPrepare()
+    public function sendToSommelier(int $sommelierId)
     {
-        $this->order = $this->order->query()
-            ->with('wine_order')
-            ->with('sommelier')
-            ->whereHas('sommelier', function($q){
-                $q->where('available', '=', true);
-            })
-            ->where('status', '=', 'preparing')
-            ->orderBy('id' ,'ASC')
-            ->first();
+        $this->order->fill([
+            'sommelier_id' => $sommelierId
+        ]);
 
-        return ! is_null($this->order);
+        return $this->order->save();
     }
 
-    public function checkAvailabilityOfWines()
+    public function processAvailabilityOfWines()
     {
         $this->order->wine_order->map(function (&$item) {
-            $today   = new \DateTime('now', new \DateTimeZone('-05:00'));
             $pubDate = new \DateTime($item->pub_date);
+            $tz      = $pubDate->getTimezone();
+            $now     = new \DateTime('now', $tz);
 
-            $item->pivot->status = $pubDate != $today ? 'unavailable' : 'delivered';
+            $item->pivot->status = $now->format('Y-m-d') === $pubDate->format('Y-m-d')
+                ? 'delivered'
+                : 'unavailable';
+
+            $item->pivot->save();
         });
+
+        return $this->order->save();
+    }
+
+    public function deliverOrder()
+    {
+        $this->order->fill(['status' => 'closed']);
 
         return $this->order->save();
     }

@@ -5,6 +5,7 @@ namespace App\Repositories;
 
 use App\Models\Sommelier;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
+use Illuminate\Http\Response;
 
 /**
  * Class SommelierRepository
@@ -47,6 +48,46 @@ class SommelierRepository implements RepositoryInterface
             : null;
     }
 
+    /**
+     * @param int $id
+     * @param bool $availability
+     * @return bool
+     * @throws \Exception
+     */
+    private function setAvailability(int $id, bool $availability)
+    {
+        $this->sommelier = $this->find($id);
+
+        if (is_null($this->sommelier)) {
+            $exceptionMessage = sprintf('Sommelier not found with id: %s', $id);
+            throw new \Exception($exceptionMessage, Response::HTTP_NOT_FOUND);
+        }
+
+        $this->sommelier->available = $availability;
+
+        return $this->sommelier->save();
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
+    public function setUnavailable($id)
+    {
+        return $this->setAvailability($id, false);
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     * @throws \Exception
+     */
+    public function setAvailable(int $id)
+    {
+        return $this->setAvailability($id, true);
+    }
+
     public function find($id)
     {
         return $this->sommelier->find($id);
@@ -74,28 +115,5 @@ class SommelierRepository implements RepositoryInterface
     public function delete($id)
     {
         return $this->sommelier->find($id)->delete();
-    }
-
-    private function setAvailability(int $id, bool $availability)
-    {
-        $this->sommelier = $this->find($id);
-
-        if (is_null($this->sommelier)) {
-            return false;
-        }
-
-        $this->sommelier->available = $availability;
-
-        return $this->sommelier->save();
-    }
-
-    public function setUnavailable($id)
-    {
-        return $this->setAvailability($id, false);
-    }
-
-    public function setAvailable(int $id)
-    {
-        return $this->setAvailability($id, true);
     }
 }

@@ -111,7 +111,7 @@ class WineSpectatorService
             $wines = array_filter($wines, function ($wine) use ($pubDateFilter) {
                 $pubDate = new \DateTime($wine['pubDate']);
 
-                return $pubDateFilter == $pubDate;
+                return $pubDateFilter->format('Y-m-d') == $pubDate->format('Y-m-d');
             });
         }
 

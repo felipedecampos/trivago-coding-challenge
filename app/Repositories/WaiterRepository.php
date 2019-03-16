@@ -5,6 +5,7 @@ namespace App\Repositories;
 
 use App\Models\Waiter;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
+use Illuminate\Http\Response;
 
 /**
  * Class WaiterRepository
@@ -38,12 +39,28 @@ class WaiterRepository implements RepositoryInterface
             ->get();
     }
 
+    public function getOneAvailable()
+    {
+        $available = $this->getAllAvailable();
+
+        return $available->count()
+            ? $available->offsetGet(array_rand($available->toArray()) ?? null) ?? null
+            : null;
+    }
+
+    /**
+     * @param int $id
+     * @param bool $availability
+     * @return bool
+     * @throws \Exception
+     */
     private function setAvailability(int $id, bool $availability)
     {
         $this->waiter = $this->find($id);
 
         if (is_null($this->waiter)) {
-            return false;
+            $exceptionMessage = sprintf('Waiter not found with id: %s', $id);
+            throw new \Exception($exceptionMessage, Response::HTTP_NOT_FOUND);
         }
 
         $this->waiter->available = $availability;
@@ -51,11 +68,21 @@ class WaiterRepository implements RepositoryInterface
         return $this->waiter->save();
     }
 
+    /**
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
     public function setUnavailable($id)
     {
         return $this->setAvailability($id, false);
     }
 
+    /**
+     * @param int $id
+     * @return bool
+     * @throws \Exception
+     */
     public function setAvailable(int $id)
     {
         return $this->setAvailability($id, true);

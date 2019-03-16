@@ -59,11 +59,10 @@ class OrderController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param OrderRepository $orderRepository
-     * @param OrderService $orderService
      * @return bool
      * @throws \Exception
      */
-    public function store(Request $request, OrderRepository $orderRepository, OrderService $orderService)
+    public function store(Request $request, OrderRepository $orderRepository)
     {
         try {
 
@@ -84,10 +83,9 @@ class OrderController extends Controller
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
-//            ProcessOrder::dispatch($orderRepository);
-//            ProcessOrder::dispatchNow($orderService);
-            $this->db->rollBack();
-//            $this->db->commit();
+            ProcessOrder::dispatch($orderRepository->order);
+
+            $this->db->commit();
 
         } catch (\Exception $e) {
 
