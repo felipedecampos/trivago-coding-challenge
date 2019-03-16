@@ -35,6 +35,7 @@ class OrderRepository implements RepositoryInterface
         return $this->order->where('user_id', '=', auth()->user()->getAuthIdentifier())
             ->with('wine_order')
             ->with('waiter')
+            ->with('sommelier')
             ->get();
     }
 
@@ -86,7 +87,9 @@ class OrderRepository implements RepositoryInterface
                 $status[] = $this->wineOrder->save();
             }
         }
-
+echo "<pre>";
+var_dump($status);
+die('died');
         return count(array_filter($status, function ($s){ return $s === true; })) === count($wines) + 1; // 1 = order
     }
 

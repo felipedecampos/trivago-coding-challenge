@@ -46,14 +46,6 @@
                                         </select>
                                     </lable>
                                 </div>
-                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <lable> <strong>Waiter:</strong> <br>
-                                        <select name="waiter_id">
-                                            <option value="1">Richard</option>
-                                            <option value="2">Paul</option>
-                                        </select>
-                                    </lable>
-                                </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center mt-5">

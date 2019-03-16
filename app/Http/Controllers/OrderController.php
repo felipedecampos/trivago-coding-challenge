@@ -45,15 +45,13 @@ class OrderController extends Controller
      * Show the form for creating a new resource.
      *
      * @param WineSpectatorService $wineSpectatorService
-     * @param WaiterService $waiterService
      * @return \Illuminate\Http\Response
      */
-    public function create(WineSpectatorService $wineSpectatorService, WaiterService $waiterService)
+    public function create(WineSpectatorService $wineSpectatorService)
     {
         $wines   = $wineSpectatorService->getAll();
-        $waiters = $waiterService->getAllAvailable();
 
-        return view('order.create', ['orders' => $waiters, 'wines' => $wines]);
+        return view('order.create', ['wines' => $wines]);
     }
 
     /**
@@ -87,7 +85,7 @@ class OrderController extends Controller
             }
 
 //            ProcessOrder::dispatch($orderRepository);
-            ProcessOrder::dispatchNow($orderService);
+//            ProcessOrder::dispatchNow($orderService);
             $this->db->rollBack();
 //            $this->db->commit();
 
