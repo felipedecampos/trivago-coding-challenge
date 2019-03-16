@@ -44,8 +44,6 @@ class WineSpectatorService
 
             $wines = $this->fetchWines($dateTime);
 
-            dd($wines);
-
             $this->db->beginTransaction();
 
             foreach ($wines as $wine) {
@@ -88,18 +86,11 @@ class WineSpectatorService
             return $wines;
         }
 
-        foreach ($wines as &$wine) {
-            $wine += $this->parseTitle($wine['title']);
-            $wine['pub_date'] = $wine['pubDate'];
+        $columns = ['guid', 'title', 'link', 'pub_date'];
 
-            unset(
-//                $wine['title'],
-                $wine['description'],
-                $wine['author'],
-                $wine['category'],
-                $wine['id'],
-                $wine['pubDate']
-            );
+        foreach ($wines as &$wine) {
+            $wine['pub_date'] = $wine['pubDate'];
+            $wine = array_intersect_key($wine, array_flip($columns));
         }
 
         return $wines;
@@ -114,8 +105,8 @@ class WineSpectatorService
         $content = file_get_contents($this->rssUrl);
         $xmlObj  = new \SimpleXmlElement($content);
         $objArr  = json_decode(json_encode($xmlObj), true);
+        $wines   = $objArr['channel']['item'] ?? [];
 
-        $wines = $objArr['channel']['item'] ?? [];
         if ($pubDateFilter !== null && count($wines)) {
             $wines = array_filter($wines, function ($wine) use ($pubDateFilter) {
                 $pubDate = new \DateTime($wine['pubDate']);
@@ -125,26 +116,6 @@ class WineSpectatorService
         }
 
         return $wines;
-    }
-
-    /**
-     * @param string $title
-     * @return array
-     */
-    private function parseTitle(string $title): array
-    {
-        $regex_all = '/^([\'A-ZÁÂÀÅÃÄÆÉÊÈËÐÍÎÌÏÓÔÒØÕÖÚÛÙÜÇÑÝ ]+)([\'A-ZÁÂÀÅÃÄÆÉÊÈËÐÍÎÌÏÓÔÒØÕÖÚÛÙÜÇÑÝ ]+.+)(\d{4})([^\\$]+\\$[^(]+)\\(([^)]+)\\)/';
-
-        if(! preg_match($regex_all, $title, $matches)):
-            return array();
-        endif;
-
-        return [
-            'variety' => trim($matches[1]),
-            'region'  => trim($matches[2]),
-            'year'    => trim($matches[3]),
-            'price'   => (double) str_replace('$', '', trim($matches[4]))
-        ];
     }
 
     public function getAll()
