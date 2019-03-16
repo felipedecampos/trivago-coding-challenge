@@ -97,23 +97,6 @@ fi
 
 r_postgrespath=${postgrespath////\\/}
 
-read -p "Redis host [$networkipbase.5]: " redishost
-if [[ -z "$redishost" ]]; then
-    redishost="$networkipbase.5"
-fi
-
-read -p "Redis port [63798] (you must use 5 characters): " redisport
-if [ -z "$redisport" ]; then
-    redisport="63798"
-fi
-
-read -p "Redis data path [/home/$USER/Workspace/.redis/$r_projectname]: " redispath
-if [ -z "$redispath" ]; then
-    redispath="/home/$USER/Workspace/.redis/$r_projectname"
-fi
-
-r_redispath=${redispath////\\/}
-
 r_dockerprojectpath=${DOCKER_PROJECT_PATH////\\/}
 
 printf "\n"
@@ -133,9 +116,6 @@ sed -i "s/{POSTGRES_PASSWORD}/$dbpass/g" $DOCKER_PROJECT_PATH/environments/triva
 sed -i "s/{POSTGRES_DB}/$dbname/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
 sed -i "s/{POSTGRES_PORT}/$dbport/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
 sed -i "s/{POSTGRES_PATH}/$r_postgrespath/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
-sed -i "s/{REDIS_HOST}/$redishost/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
-sed -i "s/{REDIS_PORT}/$redisport/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
-sed -i "s/{REDIS_PATH}/$r_redispath/g" $DOCKER_PROJECT_PATH/environments/trivago/.env
 
 yes | cp -i $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml.example $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 
@@ -152,9 +132,6 @@ sed -i "s/\${POSTGRES_PASSWORD}/$dbpass/g" $DOCKER_PROJECT_PATH/environments/tri
 sed -i "s/\${POSTGRES_DB}/$dbname/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${POSTGRES_PORT}/$dbport/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${POSTGRES_PATH}/$r_postgrespath/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
-sed -i "s/\${REDIS_HOST}/$redishost/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
-sed -i "s/\${REDIS_PORT}/$redisport/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
-sed -i "s/\${REDIS_PATH}/$r_redispath/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${NETWORK_NAME}/$NETWORK_NAME/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${NETWORK_IP}/$NETWORK_IP/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml
 sed -i "s/\${DOCKER_PROJECT_PATH}/$r_dockerprojectpath/g" $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml

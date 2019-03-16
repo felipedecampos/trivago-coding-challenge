@@ -5,7 +5,7 @@ WORKDIR "/var/www"
 # Install selected extensions and other stuff
 RUN apt-get update \
     && apt-get -q -y install --no-install-recommends ca-certificates curl acl sudo vim cron \
-    php7.2-mbstring php-xdebug php7.2-sockets php7.2-pgsql php7.2-pdo-pgsql php7.2-redis \
+    php7.2-mbstring php-xdebug php7.2-sockets php7.2-pgsql php7.2-pdo-pgsql \
     php7.2-xml php7.2-json php7.2-gd php7.2-curl
 
 RUN apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
