@@ -178,6 +178,12 @@ echo -e "\n"
 
 sed -i "s/{PROJECT_NAME}/$r_projectname/g" $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/laravel-cron
 
+yes | cp -i $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/supervisord.conf.example $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/supervisord.conf
+
+echo -e "\n"
+
+sed -i "s/{PROJECT_NAME}/$r_projectname/g" $DOCKER_PROJECT_PATH/environments/trivago/php-fpm/supervisord.conf
+
 read -p "Are you sure you want to install the project [$r_projectname] y/n? [y]: " yn
 if [[ "$yn" != "n" ]]; then
 

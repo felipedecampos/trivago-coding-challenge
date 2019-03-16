@@ -47,9 +47,6 @@ class WineSpectatorService
             $this->db->beginTransaction();
 
             foreach ($wines as $wine) {
-                $guid = explode("/", $wine['guid']); // @todo: remove before deploy
-                if (end($guid) == '15368') continue; // @todo: remove before deploy
-
                 $status = $this->wineSpectatorRepository->put($wine);
 
                 if (true !== $status) {
@@ -71,7 +68,7 @@ class WineSpectatorService
             throw $e;
 
         }
-die('died');
+
         return true;
     }
 
@@ -89,18 +86,11 @@ die('died');
             return $wines;
         }
 
-        foreach ($wines as &$wine) {
-            $wine += $this->parseTitle($wine['title']);
-            $wine['pub_date'] = $wine['pubDate'];
+        $columns = ['guid', 'title', 'link', 'pub_date'];
 
-            unset(
-                $wine['title'],
-                $wine['description'],
-                $wine['author'],
-                $wine['category'],
-                $wine['id'],
-                $wine['pubDate']
-            );
+        foreach ($wines as &$wine) {
+            $wine['pub_date'] = $wine['pubDate'];
+            $wine = array_intersect_key($wine, array_flip($columns));
         }
 
         return $wines;
@@ -115,50 +105,17 @@ die('died');
         $content = file_get_contents($this->rssUrl);
         $xmlObj  = new \SimpleXmlElement($content);
         $objArr  = json_decode(json_encode($xmlObj), true);
+        $wines   = $objArr['channel']['item'] ?? [];
 
-        $wines = $objArr['channel']['item'] ?? [];
         if ($pubDateFilter !== null && count($wines)) {
             $wines = array_filter($wines, function ($wine) use ($pubDateFilter) {
                 $pubDate = new \DateTime($wine['pubDate']);
 
-                return $pubDateFilter == $pubDate;
+                return $pubDateFilter->format('Y-m-d') == $pubDate->format('Y-m-d');
             });
         }
 
         return $wines;
-    }
-
-    /**
-     * @param string $title
-     * @return array
-     */
-    private function parseTitle(string $title): array
-    {
-        $exprVariety = '([[:upper:]]{2,})';
-        $exprRegion  = '\b(?!Spectator|Wine)\b([A-Z]{0,1}[a-z]+)';
-        $exprYear    = '(\d{4,4})';
-        $exprPrice   = '(\$\d+\.\d+|\$\d+)';
-        $exprAll     = "/$exprVariety|$exprRegion|$exprYear|$exprPrice/";
-        preg_match_all($exprAll, $title, $matches);
-
-        unset($exprVariety, $exprRegion, $exprYear, $exprPrice, $exprAll, $matches[0]);
-
-        $parsed = [];
-        $keys   = [null, 'variety', 'region', 'year', 'price'];
-
-        foreach ($matches as $key => $match) {
-            $parsed[$keys[$key]] = implode(' ', array_filter($match));
-
-            if ($key === 4) {
-                $parsed[$keys[$key]] = (double) str_replace('$', '', $parsed[$keys[$key]]);
-            }
-
-            unset($matches[$key]);
-        }
-
-        unset($keys);
-
-        return $parsed;
     }
 
     public function getAll()

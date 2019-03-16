@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessOrder;
 use App\Repositories\OrderRepository;
+use App\Services\OrderService;
 use App\Services\WaiterService;
 use App\Services\WineSpectatorService;
 use Illuminate\Database\DatabaseManager;
@@ -12,14 +14,14 @@ use Illuminate\Http\Response;
 class OrderController extends Controller
 {
     /**
-     * @var OrderRepository
-     */
-    protected $orderRepo;
-
-    /**
      * @var DatabaseManager
      */
     protected $db;
+
+    /**
+     * @var OrderRepository
+     */
+    protected $orderRepo;
 
     public function __construct(DatabaseManager $db, OrderRepository $orderRepo)
     {
@@ -43,15 +45,13 @@ class OrderController extends Controller
      * Show the form for creating a new resource.
      *
      * @param WineSpectatorService $wineSpectatorService
-     * @param WaiterService $waiterService
      * @return \Illuminate\Http\Response
      */
-    public function create(WineSpectatorService $wineSpectatorService, WaiterService $waiterService)
+    public function create(WineSpectatorService $wineSpectatorService)
     {
         $wines   = $wineSpectatorService->getAll();
-        $waiters = $waiterService->getAllAvailable();
 
-        return view('order.create', ['orders' => $waiters, 'wines' => $wines]);
+        return view('order.create', ['wines' => $wines]);
     }
 
     /**
@@ -82,6 +82,8 @@ class OrderController extends Controller
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
+
+            ProcessOrder::dispatch($orderRepository->order);
 
             $this->db->commit();
 
