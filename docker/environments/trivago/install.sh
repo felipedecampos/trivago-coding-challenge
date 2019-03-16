@@ -22,23 +22,9 @@ r_projectname="$(echo $projectname | sed -e 's/\(.*\)/\L\1/' | awk '{$1=$1};1' |
 
 echo -e "\n\e[32m$r_projectname\e[0m\n"
 
-read -p "Do you want to clone the project (notice: This command will clone the project from a github repository) y/n? [n]: " yn
-if [[ "$yn" = "y" ]]; then
-
-    read -p "Where do you want to clone the project [/home/$USER/Workspace/$r_projectname]: " projectpath
-    if [[ -z "$projectpath" ]]; then
-        projectpath="/home/$USER/Workspace/$r_projectname"
-    fi
-
-    git clone https://github.com/felipedecampos/trivago-coding-challenge.git $projectpath
-
-else
-
-    read -p "Project PATH [/home/$USER/Workspace/$r_projectname]: " projectpath
-    if [[ -z "$projectpath" ]]; then
-        projectpath="/home/$USER/Workspace/$r_projectname"
-    fi
-
+read -p "Project PATH [/home/$USER/Workspace/$r_projectname]: " projectpath
+if [[ -z "$projectpath" ]]; then
+    projectpath="/home/$USER/Workspace/$r_projectname"
 fi
 
 r_projectpath=${projectpath////\\/}
