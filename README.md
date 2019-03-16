@@ -165,7 +165,7 @@ Press the Register button on home page. Enter your name, e-mail address, passwor
 
 You will be taken to the index page. To place an order, click the button + Place order. Select one or more wines from the list. The options in green are the available wines of the day (just to make easier testing the application).
 
-After selecting the wines, click Submit. You will be taken to the index page with your orders list. Your order status will be Open and each item status is displayed as Placed. Press F5 to refresh the page until your order status is updated to Closed. Jobs will be setup to be run every 5 seconds to make easier viewing jobs steps while testing the application.
+After selecting the wines, click Submit. You will be taken to the index page with your orders list. Your order status will be Open and each item status is displayed as Placed. Press F5 to refresh the page until your order status is updated to Closed. Jobs will be setup to be run every 20 seconds to make easier viewing jobs steps while testing the application.
 
 In the first job, you will be assigned an available waiter to process your order and send it to the sommelier to check the availability of the wines.
 
