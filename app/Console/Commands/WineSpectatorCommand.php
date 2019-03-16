@@ -42,7 +42,7 @@ class WineSpectatorCommand extends Command
     {
         $date = null;
         if ($this->argument('date') !== 'all') {
-            $date = new \DateTime($this->argument('date'), new \DateTimeZone('-05:00'));
+            $date = new \DateTime($this->argument('date'), new \DateTimeZone('+00:00'));
         }
 
         $status = $wineSpectator->updateWines($date);

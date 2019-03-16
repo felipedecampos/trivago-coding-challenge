@@ -38,13 +38,13 @@ class WaitersTableSeeder extends Seeder
             $this->waiterRepo->put([
                 'first_name' => 'Richard',
                 'last_name'  => 'Goodman',
-                'available'  => false
+                'available'  => true
             ]);
 
             $this->waiterRepo->put([
                 'first_name' => 'Paul',
                 'last_name'  => 'Priestly',
-                'available'  => false
+                'available'  => true
             ]);
 
             $this->db->commit();

@@ -58,6 +58,15 @@ class Order extends Model
     }
 
     /**
+     * Retrieve sommelier of this order
+     * @return HasOne
+     */
+    public function sommelier()
+    {
+        return $this->hasOne(Sommelier::class, 'id', 'sommelier_id');
+    }
+
+    /**
      * Retrieve wines of this order
      * @return BelongsToMany
      */

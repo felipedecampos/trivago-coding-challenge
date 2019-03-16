@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -34,4 +35,14 @@ class Wine extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    /**
+     * Retrieve wines of this order
+     * @return BelongsToMany
+     */
+    public function order()
+    {
+        return $this->belongsToMany(Order::class, 'wine_orders', 'wine_guid', 'order_id')
+            ->withPivot('status');
+    }
 }
