@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -58,11 +58,10 @@
                                                     </div>
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left">
                                                         <p>
-                                                            Variety: {{ $wines->variety }}<br>
-                                                            Region: {{ $wines->region }}<br>
-                                                            Year: {{ $wines->year }}<br>
-                                                            Price: {{ $wines->price }}<br>
-                                                            Status: {{ $wines->status }}
+                                                            Variety: {{ $wines->title }}<br>
+                                                            Link: <a href="{{ $wines->link }}" target="_blank">
+                                                                {{ $wines->link }}
+                                                            </a>
                                                         </p>
                                                     </div>
                                                 </div>

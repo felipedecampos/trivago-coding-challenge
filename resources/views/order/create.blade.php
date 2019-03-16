@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -37,10 +37,7 @@
                                                     value="{{ $wine->link }}"
                                                     available="@if(new \DateTime('today', new \DateTimeZone('-05:00')) == new \DateTime($wine->pub_date)){{ '1' }}@else{{ '0' }}@endif"
                                                 >
-                                                    {{ strtoupper($wine->variety) }}
-                                                    {{ $wine->region }}
-                                                    {{ $wine->year }}
-                                                    ${{ $wine->price }}
+                                                    {{ $wine->title }}
                                                 </option>
                                             @endforeach
                                         </select>
