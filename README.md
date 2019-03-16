@@ -129,22 +129,39 @@ $ vendor/bin/phpunit
 
 ## ** Logs **
 
-To “live” view the jobs log, run into container (php-fpm):
+**To follow-up the logs, follow the steps bellow:**
+
+In the **project folder** run:  
+
+```shell
+$ cd docker && ./run.sh
+```
+
+**Enter with the options bellow:**
+
+1\) 4- Enter into container: Trivago
+
+2\) 2- PROJECT-NAME-php-fpm
+
+To “live” view the application log, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/application.log
+```
+
+To “live” view the application queries log, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/queries.log
+```
+
+To “live” view the runned jobs log, run into container (PROJECT-NAME-php-fpm):
 ```shell
 $ tail -f storage/logs/worker.log
 ```
 
-To “live” view the crontab log, run into container (php-fpm):
+To “live” view the crontab log, run into container (*php-fpm):
 ```shell
 $ tail -f storage/logs/crontab.log
 ```
-
-To “live” view the application log, run into container (php-fpm):
-```shell
-$ tail -f storage/logs/laravel-DATE.log
-```
-
-
 
 ## ** Wines catalog **
 
