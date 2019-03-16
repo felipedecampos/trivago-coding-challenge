@@ -17,10 +17,7 @@ class Wine extends Model
     protected $primaryKey = 'guid';
     protected $hidden     = ['guid'];
     protected $fillable   = [
-        'variety',
-        'region',
-        'year',
-        'price',
+        'title',
         'link',
         'pub_date',
         'created_at',

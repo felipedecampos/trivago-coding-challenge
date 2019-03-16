@@ -15,10 +15,7 @@ class CreateWinesTable extends Migration
     {
         Schema::create('wines', function (Blueprint $table) {
             $table->string('guid', 255)->unique();
-            $table->string('variety');
-            $table->string('region');
-            $table->year('year');
-            $table->float('price', 8, 2);
+            $table->string('title');
             $table->longText('link');
             $table->dateTimeTz('pub_date');
 
