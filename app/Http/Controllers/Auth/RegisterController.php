@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
@@ -63,10 +64,27 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        Log::channel('application')->info(
+            'The customer submits the register form.',
+            [$data['name']]
+        );
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showRegistrationForm()
+    {
+        Log::channel('application')->info('The customer enters in the register page.');
+
+        return view('auth.register');
     }
 }

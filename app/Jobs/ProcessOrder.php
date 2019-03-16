@@ -39,6 +39,8 @@ class ProcessOrder implements ShouldQueue
      */
     public function handle(OrderService $orderService)
     {
+        Log::channel('application')->info('ProcessOrder Job was called.');
+
         $orderService->processNextOrder($this->order);
     }
 
@@ -50,6 +52,9 @@ class ProcessOrder implements ShouldQueue
      */
     public function failed(\Exception $e)
     {
-        LOG::error('Error (' . $e->getCode() . '): ' . $e->getMessage(), $e->getTrace());
+        Log::channel('application')->error(
+            'Error (' . $e->getCode() . '): ' . $e->getMessage(),
+            $e->getTrace()
+        );
     }
 }
