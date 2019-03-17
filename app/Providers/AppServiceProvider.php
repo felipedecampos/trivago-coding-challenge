@@ -50,7 +50,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(Application $app)
     {
         try {
-
             $app->get('db')->listen(function ($query) use ($app) {
                 $app->get('log')->channel('queries')->info(
                     $query->sql,
@@ -58,11 +57,9 @@ class AppServiceProvider extends ServiceProvider
                     $query->time
                 );
             });
-
         } catch (EntryNotFoundException $e) {
             // exception
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // exception
         }
     }

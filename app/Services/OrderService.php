@@ -60,7 +60,6 @@ class OrderService
     public function processNextOrder(Order $order)
     {
         try {
-
             $this->db->beginTransaction();
 
             $this->orderRepo->order = $order;
@@ -154,13 +153,10 @@ class OrderService
             $this->waiterRepo->setAvailable($waiterId);
 
             $this->db->commit();
-
         } catch (\Exception $e) {
-
             $this->db->rollBack();
 
             throw $e;
-
         }
 
         return true;
@@ -174,7 +170,6 @@ class OrderService
     public function deliverOrder(Order $order)
     {
         try {
-
             $this->db->beginTransaction();
 
             $this->orderRepo->order = $order;
@@ -198,13 +193,10 @@ class OrderService
             }
 
             $this->db->commit();
-
         } catch (\Exception $e) {
-
             $this->db->rollBack();
 
             throw $e;
-
         }
 
         return true;

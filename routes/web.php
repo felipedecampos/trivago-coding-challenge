@@ -15,7 +15,9 @@ Route::get('/', 'HomeController@index');
 
 Auth::routes();
 
-Route::get('/home', function (){ return redirect('orders'); });
+Route::get('/home', function () {
+    return redirect('orders');
+});
 
 Route::middleware('auth')->group(function () {
     Route::resources(['orders' => 'OrderController']);

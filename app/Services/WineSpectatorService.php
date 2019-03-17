@@ -49,7 +49,6 @@ class WineSpectatorService
     public function updateWines(\DateTime $dateTime = null)
     {
         try {
-
             $wines = $this->fetchWines($dateTime);
 
             $this->db->beginTransaction();
@@ -74,13 +73,10 @@ class WineSpectatorService
             );
 
             $this->db->commit();
-
         } catch (\Exception $e) {
-
             $this->db->rollBack();
 
             throw $e;
-
         }
 
         return true;

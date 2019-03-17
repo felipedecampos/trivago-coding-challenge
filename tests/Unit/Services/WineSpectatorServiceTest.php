@@ -57,7 +57,12 @@ class WineSpectatorServiceTest extends TestCase
         $this->logManager->method('channel')
             ->willReturn(new Logger('test', [$this->loggerHandler]));
 
-        $this->service = new WineSpectatorService($rssUrl, $this->db, $this->wineSpectatorRepository, $this->logManager);
+        $this->service = new WineSpectatorService(
+            $rssUrl,
+            $this->db,
+            $this->wineSpectatorRepository,
+            $this->logManager
+        );
 
         parent::setUp();
     }

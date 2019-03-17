@@ -80,7 +80,6 @@ class OrderController extends Controller
     public function store(Request $request, OrderRepository $orderRepository)
     {
         try {
-
             $this->db->beginTransaction();
 
             $order = $request->all();
@@ -116,13 +115,10 @@ class OrderController extends Controller
             $this->logManager->channel('application')->info('ProcessOrder Job was successfully queued.');
 
             $this->db->commit();
-
         } catch (\Exception $e) {
-
             $this->db->rollBack();
 
             throw $e;
-
         }
 
         $successfullyMessage = 'The order was successfully placed.';

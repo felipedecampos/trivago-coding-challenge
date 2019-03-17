@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Wine;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
 
@@ -17,7 +16,8 @@ class WineSpectatorRepository implements RepositoryInterface
      */
     public $wine;
 
-    function __construct(Wine $wine) {
+    public function __construct(Wine $wine)
+    {
         $this->wine = $wine;
     }
 
