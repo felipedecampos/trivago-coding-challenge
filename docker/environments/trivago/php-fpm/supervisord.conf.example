@@ -41,7 +41,7 @@ autostart=true
 autorestart=true
 priority=10
 user=docker
-numprocs=2
+numprocs=1
 redirect_stderr=true
 stdout_logfile=/var/www/{PROJECT_NAME}/storage/logs/worker.log
 

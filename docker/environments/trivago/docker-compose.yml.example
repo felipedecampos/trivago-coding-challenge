@@ -55,19 +55,6 @@ services:
       ${NETWORK_NAME}:
         ipv4_address: ${POSTGRES_HOST}
 
-  redis:
-    image: redis:alpine
-    container_name: ${PROJECT_NAME}-redis
-    restart: always
-    volumes:
-      - ${REDIS_PATH}:/var/lib/redis
-    command: redis-server --appendonly yes
-    ports:
-      - "${REDIS_PORT}:6379"
-    networks:
-      ${NETWORK_NAME}:
-        ipv4_address: ${REDIS_HOST}
-
 networks:
   ${NETWORK_NAME}:
     driver: bridge

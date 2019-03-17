@@ -1,7 +1,10 @@
 # Coding challenge - Be the owner of a winery
 
+## ** Introduction ** 
+[Link to my introduction](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/INTRODUCTION.md)
+
 ## ** Test specification ** 
-[Link of the test specification](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs)
+[Link to the test specification](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs)
 
 ## ** Project BOARD (Kanban) **
 [Link to Kanban](https://github.com/felipedecampos/trivago-coding-challenge/projects/1)
@@ -61,10 +64,11 @@ $ cd docker && ./run.sh
     > Network set up: trivago > 180.12.0.0
     
 3\) 3- Install project: Trivago 
+
+**Note: If you want to insert the \[default value\], just press the Enter button**
+
   - Project name \[trivago-coding-challenge\]: 
     > trivago-coding-challenge 
-  - Do you want to clone the project \(notice: This command will clone the project from a github repository\) y/n? \[n\]: 
-    > n
   - Project PATH \[/home/USER/Workspace/trivago-coding-challenge\]: 
     > /home/$USER/Workspace/trivago-coding-challenge 
   - App url \[trivago-coding-challenge.local\]: 
@@ -87,26 +91,10 @@ $ cd docker && ./run.sh
     > trivago-coding-challenge
   - Postgres data path \[/home/USER/Workspace/.db/postgres/trivago-coding-challenge\]:
     > /home/$USER/Workspace/.db/postgres/trivago-coding-challenge
-  - Redis host \[180.12.0.5\]:
-    > 180.12.0.5
-  - Redis port \[63798\] (you must use 5 characters):
-    > 63798
-  - Redis data path \[/home/USER/Workspace/.redis/trivago-coding-challenge\]:
-    > /home/$USER/Workspace/.redis/trivago-coding-challenge
   - Are you sure you want to install the project \[trivago-coding-challenge\] y/n? \[y\]:
     > y
-  - Would you like to configure smtp \(this is required if you want to send emails\) y/n? \[n\]:
+  - Do you want to add the project host on your /etc/hosts file? \(warning: This command needs the sudo privilege\) y\/n? \[n\]:
     > y
-  - Encryption type \[tls\]: 
-    > tls
-  - SMTP host \[smtp.gmail.com\]: 
-    > smtp.gmail.com
-  - SMTP port \[587\]: 
-    > 587
-  - SMTP user \[user@gmail.com\]: 
-    > your_email@gmail.com
-  - SMTP password \[null\]:
-    > your_password
 
 **Click the link below to access the project:**
 
@@ -120,6 +108,115 @@ The installer helper will install the project environment with docker-compose
 
 All tests were made in Debian 9, I can't guarantee it will work on other operating systems
 
+#### The script didn't work?
+
+**Follow the steps below to install the project manually:**
+
+In the **project folder** run:
+
+```shell
+yes | cp -i docker/.env.example docker/.env
+yes | cp -i docker/environments/trivago/.env.example docker/environments/trivago/.env
+yes | cp -i docker/environments/trivago/docker-compose.yml.example docker/environments/trivago/docker-compose.yml
+yes | cp -i docker/environments/trivago/nginx/nginx.conf.example docker/environments/trivago/nginx/nginx.conf
+yes | cp -i docker/environments/trivago/php-fpm/overrides.ini.example docker/environments/trivago/php-fpm/overrides.ini
+yes | cp -i docker/environments/trivago/php-fpm/laravel-cron.example docker/environments/trivago/php-fpm/laravel-cron
+yes | cp -i docker/environments/trivago/php-fpm/supervisord.conf.example docker/environments/trivago/php-fpm/supervisord.conf
+yes | cp -i .env.example .env
+```
+
+Please, fill the variables of the files created above, follow the examples bellow:
+
+**Note: Make sure to replace all variables defined with curly brackets {VARIABLE}**
+
+**docker/.env**:
+
+- replace the {NETWORK_NAME} variable to:
+    > trivago
+- replace the {NETWORK_IP} variable to:
+    > 180.12.0.0
+- replace the {DOCKER_PROJECT_PATH} variable to:
+    > {PROJECT_FOLDER}/docker
+
+**docker/environments/trivago/.env**:
+
+- Replace the {PROJECT_NAME} variable to:
+    > trivago-coding-challenge
+- Replace the {PROJECT_PATH} variable to:
+    > /home/{USER}/Workspace/trivago-coding-challenge
+- Replace the {APP_URL} variable to:
+    > trivago-coding-challenge.local
+- Replace the {NGINX_HOST} variable to:
+    > 180.12.0.2
+- Replace the {PHP_HOST} variable to:
+    > 180.12.0.3
+- Replace the {POSTGRES_HOST} variable to:
+    > 180.12.0.4
+- Replace the {POSTGRES_USER} variable to:
+    > trivago
+- Replace the {POSTGRES_PASSWORD} variable to:
+    > 165497381546982
+- Replace the {POSTGRES_DB} variable to:
+    > trivago-coding-challenge
+- Replace the {POSTGRES_PORT} variable to:
+    > 54329
+- Replace the {POSTGRES_PATH} variable to:
+    > /home/{USER}/Workspace/.db/postgres/trivago-coding-challenge
+
+**docker/environments/trivago/nginx/nginx.conf**:
+
+- Replace the {APP_URL} variable to:
+    > trivago-coding-challenge.local
+- Replace the {PROJECT_PATH} variable to:
+    > /home/{USER}/Workspace/trivago-coding-challenge
+
+**docker/environments/trivago/php-fpm/overrides.ini**:
+
+- Replace the ${NGINX_HOST} variable to:
+    > 180.12.0.2
+
+**docker/environments/trivago/php-fpm/laravel-cron**:
+
+- Replace the {PROJECT_NAME} variable to:
+    > trivago-coding-challenge
+
+**docker/environments/trivago/php-fpm/supervisord.conf**:
+
+- Replace all {PROJECT_NAME} variables to:
+    > trivago-coding-challenge
+
+**.env**:
+
+- Fill the env file with the data bellow:
+    > APP_NAME=trivago-coding-challenge
+    
+    > APP_URL=http://trivago-coding-challenge.local
+    
+    > DB_CONNECTION=pgsql
+    
+    > DB_HOST=180.12.0.4
+    
+    > DB_PORT=5432
+    
+    > DB_DATABASE=trivago-coding-challenge
+    
+    > DB_USERNAME=trivago
+    
+    > DB_PASSWORD=165497381546982
+
+In the **project folder** run:
+
+```shell
+docker-compose -f docker/environments/trivago/docker-compose.yml --project-name "trivago-coding-challenge" up -d --force-recreate --build --remove-orphans
+docker exec --user docker trivago-coding-challenge-php-fpm /bin/bash -c "cd trivago-coding-challenge && composer install"
+docker exec --user docker trivago-coding-challenge-php-fpm /bin/bash -c "cd trivago-coding-challenge && php artisan key:generate"
+chmod 777 $(find ../storage/ -not -name ".gitignore")
+chmod 777 $(find ../bootstrap/cache/ -not -name ".gitignore")
+docker exec --user docker trivago-coding-challenge-php-fpm /bin/bash -c "cd trivago-coding-challenge && php artisan migrate:refresh --seed"
+docker exec --user docker trivago-coding-challenge-php-fpm /bin/bash -c "cd trivago-coding-challenge && php artisan wine-spectator:watch all"
+sudo -- sh -c -e "echo '180.12.0.2\ttrivago-coding-challenge.local' >> /etc/hosts";
+```
+
 ## ** Testing **
 
 To test the application go to the project folder and run tests:
@@ -129,22 +226,39 @@ $ vendor/bin/phpunit
 
 ## ** Logs **
 
-To “live” view the jobs log, run into container (php-fpm):
+**To follow-up the logs, follow the steps bellow:**
+
+In the **project folder** run:  
+
+```shell
+$ cd docker && ./run.sh
+```
+
+**Enter the options bellow:**
+
+1\) 4- Enter into container: Trivago
+
+2\) 2- PROJECT-NAME-php-fpm
+
+To “live” view the application log, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/application.log
+```
+
+To “live” view the application queries log, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/queries.log
+```
+
+To “live” view the ran jobs log, run into container (PROJECT-NAME-php-fpm):
 ```shell
 $ tail -f storage/logs/worker.log
 ```
 
-To “live” view the crontab log, run into container (php-fpm):
+To “live” view the crontab log, run into container (*php-fpm):
 ```shell
 $ tail -f storage/logs/crontab.log
 ```
-
-To “live” view the application log, run into container (php-fpm):
-```shell
-$ tail -f storage/logs/laravel-DATE.log
-```
-
-
 
 ## ** Wines catalog **
 
@@ -161,7 +275,7 @@ $ php artisan wine-spectator:watch
 ## ** What has been done **
 You will need to register on site to place orders.
 
-Press the Register button on home page. Enter your name, e-mail address, password, and confirm you password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
+Press the Register button on home page. Enter your name, e-mail address, password, and confirm your password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
 
 You will be taken to the index page. To place an order, click the button + Place order. Select one or more wines from the list. The options in green are the available wines of the day (just to make easier testing the application).
 

@@ -36,7 +36,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => ['daily', 'syslog', 'errorlog', 'application', 'queries'],
             'ignore_exceptions' => false,
         ],
 
@@ -87,6 +87,18 @@ return [
 
         'errorlog' => [
             'driver' => 'errorlog',
+            'level' => 'debug',
+        ],
+
+        'application' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/application.log'),
+            'level' => 'debug',
+        ],
+
+        'queries' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/queries.log'),
             'level' => 'debug',
         ],
     ],

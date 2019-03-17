@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessOrder;
 use App\Repositories\OrderRepository;
-use App\Services\OrderService;
-use App\Services\WaiterService;
 use App\Services\WineSpectatorService;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -36,6 +35,11 @@ class OrderController extends Controller
      */
     public function index()
     {
+        Log::channel('application')->info(
+            'The customer enters in the order list page.',
+            [auth()->user()->getAuthIdentifierName() => auth()->user()->getAuthIdentifier()]
+        );
+
         $orders = $this->orderRepo->getAll();
 
         return view('order.index', ['orders' => $orders]);
@@ -49,6 +53,11 @@ class OrderController extends Controller
      */
     public function create(WineSpectatorService $wineSpectatorService)
     {
+        Log::channel('application')->info(
+            'The customer enters in the create order page.',
+            [auth()->user()->getAuthIdentifierName() => auth()->user()->getAuthIdentifier()]
+        );
+
         $wines   = $wineSpectatorService->getAll();
 
         return view('order.create', ['wines' => $wines]);
@@ -80,10 +89,25 @@ class OrderController extends Controller
                     print_r($order, true)
                 );
 
+                Log::channel('application')->error(
+                    $exceptionMessage,
+                    $orderRepository->order->getAttributes()
+                );
+
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
             ProcessOrder::dispatch($orderRepository->order);
+
+            Log::channel('application')->info(
+                'The customer submits an order to store.',
+                [
+                    'order' => $orderRepository->order->getAttributes(),
+                    'wines' => $orderRepository->wineOrder->getAttributes()
+                ]
+            );
+
+            Log::channel('application')->info('ProcessOrder Job was successfully queued.');
 
             $this->db->commit();
 
@@ -95,7 +119,14 @@ class OrderController extends Controller
 
         }
 
-        \Session::flash('status','Order successfully placed.');
+        $successfullyMessage = 'The order was successfully placed.';
+
+        Log::channel('application')->info(
+            $successfullyMessage,
+            [$orderRepository->order->getAttribute('id')]
+        );
+
+        \Session::flash('status', $successfullyMessage);
 
         return redirect()->route('orders.index');
     }

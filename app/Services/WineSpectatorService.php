@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\WineSpectatorRepository;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class WineSpectatorService
 {
@@ -55,9 +56,15 @@ class WineSpectatorService
                         print_r($wine, true)
                     );
 
+                    Log::channel('application')->error($exceptionMessage);
+
                     throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
                 }
             }
+
+            Log::channel('application')->info(
+                'Wines were successfully updated.'
+            );
 
             $this->db->commit();
 
