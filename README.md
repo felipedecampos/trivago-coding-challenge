@@ -90,18 +90,8 @@ $ cd docker && ./run.sh
     > /home/$USER/Workspace/.db/postgres/trivago-coding-challenge
   - Are you sure you want to install the project \[trivago-coding-challenge\] y/n? \[y\]:
     > y
-  - Would you like to configure smtp \(this is required if you want to send emails\) y/n? \[n\]:
+  - Do you want to add the project host on your /etc/hosts file? \(warning: This command needs the sudo privilege\) y\/n? \[n\]:
     > y
-  - Encryption type \[tls\]: 
-    > tls
-  - SMTP host \[smtp.gmail.com\]: 
-    > smtp.gmail.com
-  - SMTP port \[587\]: 
-    > 587
-  - SMTP user \[user@gmail.com\]: 
-    > your_email@gmail.com
-  - SMTP password \[null\]:
-    > your_password
 
 **Click the link below to access the project:**
 
