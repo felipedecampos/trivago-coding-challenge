@@ -226,11 +226,6 @@ if [[ "$yn" != "n" ]]; then
     chmod 777 $(find ../storage/ -not -name ".gitignore")
     chmod 777 $(find ../bootstrap/cache/ -not -name ".gitignore")
 
-    touch $r_projectpath/storage/logs/worker.log
-    touch $r_projectpath/storage/logs/crontab.log
-    touch $r_projectpath/storage/logs/queries.log
-    touch $r_projectpath/storage/logs/application.log
-
     docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan migrate:refresh --seed"
 
     docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && php artisan wine-spectator:watch all"
