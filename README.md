@@ -1,5 +1,8 @@
 # Coding challenge - Be the owner of a winery
 
+## ** Introduction ** 
+[Link to my introduction](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/INTRODUCTION.md)
+
 ## ** Test specification ** 
 [Link to the test specification](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs)
 
