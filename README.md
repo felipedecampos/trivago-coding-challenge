@@ -1,7 +1,7 @@
 # Coding challenge - Be the owner of a winery
 
 ## ** Test specification ** 
-[Link of the test specification](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs)
+[Link to the test specification](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs)
 
 ## ** Project BOARD (Kanban) **
 [Link to Kanban](https://github.com/felipedecampos/trivago-coding-challenge/projects/1)
@@ -105,7 +105,7 @@ The installer helper will install the project environment with docker-compose
 
 All tests were made in Debian 9, I can't guarantee it will work on other operating systems
 
-#### The script didn't work in your operating system
+#### The script didn't work?
 
 **Follow the steps below to install the project manually:**
 
@@ -179,7 +179,7 @@ Please, fill the variables of the files created above, follow the examples bello
 
 **docker/environments/trivago/php-fpm/supervisord.conf**:
 
-- Replace all {PROJECT_NAME} variable to:
+- Replace all {PROJECT_NAME} variables to:
     > trivago-coding-challenge
 
 **.env**:
@@ -231,7 +231,7 @@ In the **project folder** run:
 $ cd docker && ./run.sh
 ```
 
-**Enter with the options bellow:**
+**Enter the options bellow:**
 
 1\) 4- Enter into container: Trivago
 
@@ -272,7 +272,7 @@ $ php artisan wine-spectator:watch
 ## ** What has been done **
 You will need to register on site to place orders.
 
-Press the Register button on home page. Enter your name, e-mail address, password, and confirm you password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
+Press the Register button on home page. Enter your name, e-mail address, password, and confirm your password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
 
 You will be taken to the index page. To place an order, click the button + Place order. Select one or more wines from the list. The options in green are the available wines of the day (just to make easier testing the application).
 
