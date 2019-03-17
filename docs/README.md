@@ -58,14 +58,20 @@ In the resources section, you will find the information required to do this task
 
 **Task 1 - Priorities**
 
-[Link of the specification file](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_I_PRIORITIES.pdf)
+[Link to the specification file](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_I_PRIORITIES.pdf)
+
+[Link to the resolution](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_I_PRIORITIES.md)
 
 **TASK 2 - Develop a Feature**
 
-[Link of the specification file](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_II_FEATURE_WINERY.pdf)
+[Link to the specification file](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_II_FEATURE_WINERY.pdf)
 
-[LINK of the RSS feed](https://www.winespectator.com/rss/rss?t=dwp)
+[Link to the RSS feed](https://www.winespectator.com/rss/rss?t=dwp)
+
+[Link to the coding test](https://github.com/felipedecampos/trivago-coding-challenge)
 
 **TASK 3 - MySQL**
 
-[Link of the specification file](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_III_MYSQL.pdf)
+[Link to the specification file](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_III_MYSQL.pdf)
+
+[Link to the resolution](https://github.com/felipedecampos/trivago-coding-challenge/tree/master/docs/TASK_III_MYSQL.md)
