@@ -152,7 +152,7 @@ if [[ "$yn" != "n" ]]; then
 
     echo -e "\n"
 
-    cp $projectpath/.env.example $projectpath/.env
+    yes | cp -i $projectpath/.env.example $projectpath/.env
 
     sed -i "s/APP_NAME\=Laravel/APP_NAME\=$r_projectname/g" $projectpath/.env
     sed -i "s/APP_URL\=http\:\/\/localhost/APP_URL\=http\:\/\/$appurl/g" $projectpath/.env

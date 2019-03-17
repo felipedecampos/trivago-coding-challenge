@@ -56,7 +56,7 @@ class LoginController extends Controller
     protected function sendLoginResponse(Request $request)
     {
         Log::channel('application')->info(
-            'The customer submits the log in the application.',
+            'The customer submits the login form.',
             [$this->guard()->user()->getAuthIdentifierName() => $this->guard()->user()->getAuthIdentifier()]
         );
 
@@ -79,7 +79,7 @@ class LoginController extends Controller
     protected function sendFailedLoginResponse(Request $request)
     {
         Log::channel('application')->info(
-            'The customer could not logged in the application.'
+            'The customer could not login to the application.'
         );
 
         throw ValidationException::withMessages([
@@ -96,7 +96,7 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Log::channel('application')->info(
-            'The customer logged out the application.',
+            'The customer logout of the application.',
             [$this->guard()->user()->getAuthIdentifierName() => $this->guard()->user()->getAuthIdentifier()]
         );
 
