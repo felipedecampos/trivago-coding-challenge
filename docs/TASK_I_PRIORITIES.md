@@ -6,13 +6,13 @@ Trivago's purpose is to connect travelers and hotels, so when we redirect the us
 
 **4\. Price filter returns incorrect results**
 
-Price filter is the first option users can set, so I assume it`s the most used by them to find their hotels. Therefore, this bug has a huge impact on most Trivago`s users.
+Price filter is the first option users can set, so I assume it's the most used by them to find their hotels. Therefore, this bug has a huge impact on most Trivago's users.
 
 ### High
 
 **2\. Pagination on search results page doesn't work**
 
-It`s important that users have access to all options in their search, but with this bug a user would be able to see the first page of results correctly. That`s why I classified it as High instead of Urgent.
+It's important that users have access to all options in their search, but with this bug a user would be able to see the first page of results correctly. That's why I classified it as High instead of Urgent.
 
 **5\. Sorting by distance to city center doesn't work**
 
