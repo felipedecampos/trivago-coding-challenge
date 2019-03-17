@@ -11,15 +11,7 @@
 |
 */
 
-use Illuminate\Support\Facades\Log;
-
-Route::get('/', function () {
-    Log::channel('application')->info(
-        'The customer enters in the home application.',
-        auth()->check() ? [auth()->user()->getAuthIdentifierName() => auth()->user()->getAuthIdentifier()] : []
-    );
-    return view('welcome');
-});
+Route::get('/', 'HomeController@index');
 
 Auth::routes();
 

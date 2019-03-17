@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Repositories\WineSpectatorRepository;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Log\LogManager;
 
 class WineSpectatorService
 {
@@ -24,14 +24,21 @@ class WineSpectatorService
      */
     public $wineSpectatorRepository;
 
+    /**
+     * @var LogManager
+     */
+    protected $logManager;
+
     public function __construct(
         string $rssUrl,
         DatabaseManager $db,
-        WineSpectatorRepository $wineSpectatorRepository
+        WineSpectatorRepository $wineSpectatorRepository,
+        LogManager $logManager
     ) {
-        $this->rssUrl = $rssUrl;
-        $this->db = $db;
+        $this->rssUrl                  = $rssUrl;
+        $this->db                      = $db;
         $this->wineSpectatorRepository = $wineSpectatorRepository;
+        $this->logManager              = $logManager;
     }
 
     /**
@@ -56,13 +63,13 @@ class WineSpectatorService
                         print_r($wine, true)
                     );
 
-                    Log::channel('application')->error($exceptionMessage);
+                    $this->logManager->channel('application')->error($exceptionMessage);
 
                     throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
                 }
             }
 
-            Log::channel('application')->info(
+            $this->logManager->channel('application')->info(
                 'Wines were successfully updated.'
             );
 

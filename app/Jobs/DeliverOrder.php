@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Log\LogManager;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,12 +35,13 @@ class DeliverOrder implements ShouldQueue
      * Execute the job.
      *
      * @param OrderService $orderService
+     * @param LogManager $logManager
      * @return void
      * @throws \Exception
      */
-    public function handle(OrderService $orderService)
+    public function handle(OrderService $orderService, LogManager $logManager)
     {
-        Log::channel('application')->info('DeliverOrder Job was called.');
+        $logManager->channel('application')->info('DeliverOrder Job was called.');
 
         $orderService->deliverOrder($this->order);
     }

@@ -8,9 +8,8 @@ use App\Repositories\WaiterRepository;
 use App\Repositories\WineSpectatorRepository;
 use App\Services\OrderService;
 use App\Services\WineSpectatorService;
+use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,7 +25,8 @@ class AppServiceProvider extends ServiceProvider
             return new WineSpectatorService(
                 config('external.wine-spectator.rss'),
                 $app->get('db'),
-                $app->get(WineSpectatorRepository::class)
+                $app->get(WineSpectatorRepository::class),
+                $app->get('log')
             );
         });
 
@@ -35,7 +35,8 @@ class AppServiceProvider extends ServiceProvider
                 $app->get('db'),
                 $app->get(OrderRepository::class),
                 $app->get(WaiterRepository::class),
-                $app->get(SommelierRepository::class)
+                $app->get(SommelierRepository::class),
+                $app->get('log')
             );
         });
     }
@@ -43,16 +44,26 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      *
+     * @param Application $app
      * @return void
      */
-    public function boot()
+    public function boot(Application $app)
     {
-        DB::listen(function($query) {
-            Log::channel('queries')->info(
-                $query->sql,
-                $query->bindings,
-                $query->time
-            );
-        });
+        try {
+
+            $app->get('db')->listen(function ($query) use ($app) {
+                $app->get('log')->channel('queries')->info(
+                    $query->sql,
+                    $query->bindings,
+                    $query->time
+                );
+            });
+
+        } catch (EntryNotFoundException $e) {
+            // exception
+        }
+        catch (\Exception $e) {
+            // exception
+        }
     }
 }

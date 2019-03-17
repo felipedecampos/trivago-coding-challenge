@@ -8,7 +8,7 @@ use App\Services\WineSpectatorService;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Log\LogManager;
 
 class OrderController extends Controller
 {
@@ -22,10 +22,16 @@ class OrderController extends Controller
      */
     protected $orderRepo;
 
-    public function __construct(DatabaseManager $db, OrderRepository $orderRepo)
+    /**
+     * @var LogManager
+     */
+    protected $logManager;
+
+    public function __construct(DatabaseManager $db, LogManager $logManager, OrderRepository $orderRepo)
     {
-        $this->db        = $db;
-        $this->orderRepo = $orderRepo;
+        $this->db         = $db;
+        $this->orderRepo  = $orderRepo;
+        $this->logManager = $logManager;
     }
 
     /**
@@ -35,7 +41,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        Log::channel('application')->info(
+        $this->logManager->channel('application')->info(
             'The customer enters in the order list page.',
             [auth()->user()->getAuthIdentifierName() => auth()->user()->getAuthIdentifier()]
         );
@@ -53,12 +59,12 @@ class OrderController extends Controller
      */
     public function create(WineSpectatorService $wineSpectatorService)
     {
-        Log::channel('application')->info(
+        $this->logManager->channel('application')->info(
             'The customer enters in the create order page.',
             [auth()->user()->getAuthIdentifierName() => auth()->user()->getAuthIdentifier()]
         );
 
-        $wines   = $wineSpectatorService->getAll();
+        $wines = $wineSpectatorService->getAll();
 
         return view('order.create', ['wines' => $wines]);
     }
@@ -89,7 +95,7 @@ class OrderController extends Controller
                     print_r($order, true)
                 );
 
-                Log::channel('application')->error(
+                $this->logManager->channel('application')->error(
                     $exceptionMessage,
                     $orderRepository->order->getAttributes()
                 );
@@ -99,7 +105,7 @@ class OrderController extends Controller
 
             ProcessOrder::dispatch($orderRepository->order);
 
-            Log::channel('application')->info(
+            $this->logManager->channel('application')->info(
                 'The customer submits an order to store.',
                 [
                     'order' => $orderRepository->order->getAttributes(),
@@ -107,7 +113,7 @@ class OrderController extends Controller
                 ]
             );
 
-            Log::channel('application')->info('ProcessOrder Job was successfully queued.');
+            $this->logManager->channel('application')->info('ProcessOrder Job was successfully queued.');
 
             $this->db->commit();
 
@@ -121,7 +127,7 @@ class OrderController extends Controller
 
         $successfullyMessage = 'The order was successfully placed.';
 
-        Log::channel('application')->info(
+        $this->logManager->channel('application')->info(
             $successfullyMessage,
             [$orderRepository->order->getAttribute('id')]
         );

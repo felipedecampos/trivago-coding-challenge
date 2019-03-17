@@ -9,7 +9,7 @@ use App\Repositories\SommelierRepository;
 use App\Repositories\WaiterRepository;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Log\LogManager;
 
 class OrderService
 {
@@ -33,11 +33,23 @@ class OrderService
      */
     protected $sommelierRepo;
 
-    public function __construct(DatabaseManager $db, OrderRepository $orderRepo, WaiterRepository $waiterRepo, SommelierRepository $sommelierRepo) {
+    /**
+     * @var LogManager
+     */
+    protected $logManager;
+
+    public function __construct(
+        DatabaseManager $db,
+        OrderRepository $orderRepo,
+        WaiterRepository $waiterRepo,
+        SommelierRepository $sommelierRepo,
+        LogManager $logManager
+    ) {
         $this->db            = $db;
         $this->orderRepo     = $orderRepo;
         $this->waiterRepo    = $waiterRepo;
         $this->sommelierRepo = $sommelierRepo;
+        $this->logManager    = $logManager;
     }
 
     /**
@@ -58,7 +70,7 @@ class OrderService
              */
             $waiterId = $this->waiterRepo->getOneAvailable()->getAttribute('id') ?? null;
 
-            Log::channel('application')->info(
+            $this->logManager->channel('application')->info(
                 'The waiter takes the order to prepare.',
                 [
                     'waiterId' => $waiterId,
@@ -76,7 +88,7 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
-                Log::channel('application')->error($exceptionMessage);
+                $this->logManager->channel('application')->error($exceptionMessage);
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
@@ -86,7 +98,7 @@ class OrderService
              */
             $sommelierId = $this->sommelierRepo->getOneAvailable()->getAttribute('id') ?? null;
 
-            Log::channel('application')->info(
+            $this->logManager->channel('application')->info(
                 'The waiter sends the order to sommelier.',
                 [
                     'order'       => $this->orderRepo->order->getAttributes(),
@@ -102,7 +114,7 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
-                Log::channel('application')->error($exceptionMessage);
+                $this->logManager->channel('application')->error($exceptionMessage);
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
@@ -120,12 +132,12 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
-                Log::channel('application')->error($exceptionMessage);
+                $this->logManager->channel('application')->error($exceptionMessage);
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
-            Log::channel('application')->info(
+            $this->logManager->channel('application')->info(
                 'The sommelier checks the availability of wines.',
                 $this->orderRepo->order->getAttributes()
             );
@@ -135,7 +147,7 @@ class OrderService
              */
             DeliverOrder::dispatch($this->orderRepo->order);
 
-            Log::channel('application')->info('DeliverOrder Job was successfully queued.');
+            $this->logManager->channel('application')->info('DeliverOrder Job was successfully queued.');
 
             $this->sommelierRepo->setAvailable($sommelierId);
 
@@ -167,7 +179,7 @@ class OrderService
 
             $this->orderRepo->order = $order;
 
-            Log::channel('application')->info(
+            $this->logManager->channel('application')->info(
                 'The waiter delivers and closes the order.',
                 $this->orderRepo->order->getAttributes()
             );
@@ -180,7 +192,7 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
-                Log::channel('application')->error($exceptionMessage);
+                $this->logManager->channel('application')->error($exceptionMessage);
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }

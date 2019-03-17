@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
@@ -32,13 +32,20 @@ class RegisterController extends Controller
     protected $redirectTo = '/home';
 
     /**
+     * @var LogManager
+     */
+    protected $logManager;
+
+    /**
      * Create a new controller instance.
      *
-     * @return void
+     * @param LogManager $logManager
      */
-    public function __construct()
+    public function __construct(LogManager $logManager)
     {
         $this->middleware('guest');
+
+        $this->logManager = $logManager;
     }
 
     /**
@@ -64,7 +71,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        Log::channel('application')->info(
+        $this->logManager->channel('application')->info(
             'The customer submits the register form.',
             [$data['name']]
         );
@@ -83,7 +90,7 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm()
     {
-        Log::channel('application')->info('The customer enters in the register page.');
+        $this->logManager->channel('application')->info('The customer enters in the register page.');
 
         return view('auth.register');
     }

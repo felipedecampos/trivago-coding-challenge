@@ -3,17 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Log\LogManager;
 
 class HomeController extends Controller
 {
     /**
+     * @var LogManager
+     */
+    protected $logManager;
+
+    /**
      * Create a new controller instance.
      *
-     * @return void
+     * @param LogManager $logManager
      */
-    public function __construct()
+    public function __construct(LogManager $logManager)
     {
-        $this->middleware('auth');
+        $this->logManager = $logManager;
     }
 
     /**
@@ -23,6 +29,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $this->logManager->channel('application')->info(
+            'The customer enters in the home application.',
+            auth()->check() ? [auth()->user()->getAuthIdentifierName() => auth()->user()->getAuthIdentifier()] : []
+        );
+
+        return view('welcome');
     }
 }
