@@ -19,7 +19,7 @@ fi
 
 echo -e "\e[33m"
 
-read -p " Are you sure do you want to uninstall the project $PROJECT_NAME (notice: There is no way to undo this) y/n? [n]: " yn
+read -p " Are you sure you want to uninstall the project $PROJECT_NAME (notice: There is no way to undo this) y/n? [n]: " yn
 if [[ "$yn" = "y" ]]; then
     echo -e "\e[0m"
 
