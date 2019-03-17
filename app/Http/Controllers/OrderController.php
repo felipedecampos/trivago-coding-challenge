@@ -100,7 +100,7 @@ class OrderController extends Controller
             ProcessOrder::dispatch($orderRepository->order);
 
             Log::channel('application')->info(
-                'The customer submited an order to store',
+                'The customer submits an order to store.',
                 [
                     'order' => $orderRepository->order->getAttributes(),
                     'wines' => $orderRepository->wineOrder->getAttributes()
@@ -119,7 +119,7 @@ class OrderController extends Controller
 
         }
 
-        $successfullyMessage = 'Order was successfully placed.';
+        $successfullyMessage = 'The order was successfully placed.';
 
         Log::channel('application')->info(
             $successfullyMessage,

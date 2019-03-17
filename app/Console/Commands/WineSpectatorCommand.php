@@ -42,7 +42,7 @@ class WineSpectatorCommand extends Command
     public function handle(WineSpectatorService $wineSpectator)
     {
         Log::channel('application')->info(
-            'The command was successfully called.',
+            'The command was successfully ran.',
             ['command' => 'wine-spectator:watch ' . $this->argument('date')]
         );
 
