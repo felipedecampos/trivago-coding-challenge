@@ -7,7 +7,6 @@ use App\Repositories\SommelierRepository;
 use App\Repositories\WaiterRepository;
 use App\Repositories\WineSpectatorRepository;
 use App\Services\OrderService;
-use App\Services\WaiterService;
 use App\Services\WineSpectatorService;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
@@ -31,13 +30,6 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(WaiterService::class, function (Application $app): WaiterService {
-            return new WaiterService(
-                $app->get('db'),
-                $app->get(WaiterRepository::class)
-            );
-        });
-
         $this->app->singleton(OrderService::class, function (Application $app): OrderService {
             return new OrderService(
                 $app->get('db'),
@@ -56,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         DB::listen(function($query) {
-            Log::info(
+            Log::channel('queries')->info(
                 $query->sql,
                 $query->bindings,
                 $query->time

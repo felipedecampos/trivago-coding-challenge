@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\WineSpectatorService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class WineSpectatorCommand extends Command
 {
@@ -40,6 +41,11 @@ class WineSpectatorCommand extends Command
      */
     public function handle(WineSpectatorService $wineSpectator)
     {
+        Log::channel('application')->info(
+            'The command was successfully called.',
+            ['command' => 'wine-spectator:watch ' . $this->argument('date')]
+        );
+
         $date = null;
         if ($this->argument('date') !== 'all') {
             $date = new \DateTime($this->argument('date'), new \DateTimeZone('+00:00'));

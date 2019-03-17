@@ -9,6 +9,7 @@ use App\Repositories\SommelierRepository;
 use App\Repositories\WaiterRepository;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -52,7 +53,18 @@ class OrderService
 
             $this->orderRepo->order = $order;
 
+            /**
+             * Prepare the order
+             */
             $waiterId = $this->waiterRepo->getOneAvailable()->getAttribute('id') ?? null;
+
+            Log::channel('application')->info(
+                'The waiter takes the order to prepare.',
+                [
+                    'waiterId' => $waiterId,
+                    'order'    => $this->orderRepo->order->getAttributes()
+                ]
+            );
 
             $this->waiterRepo->setUnavailable($waiterId);
 
@@ -64,10 +76,23 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
+                Log::channel('application')->error($exceptionMessage);
+
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
+            /**
+             * Send order to sommelier
+             */
             $sommelierId = $this->sommelierRepo->getOneAvailable()->getAttribute('id') ?? null;
+
+            Log::channel('application')->info(
+                'The waiter sends the order to sommelier.',
+                [
+                    'order'       => $this->orderRepo->order->getAttributes(),
+                    'sommelierId' => $sommelierId
+                ]
+            );
 
             $statusSommelier = $this->orderRepo->sendToSommelier($sommelierId);
 
@@ -77,11 +102,16 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
+                Log::channel('application')->error($exceptionMessage);
+
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
             $this->sommelierRepo->setUnavailable($sommelierId);
 
+            /**
+             * Check the availability of wines
+             */
             $statusAvailability = $this->orderRepo->processAvailabilityOfWines();
 
             if (true !== $statusAvailability) {
@@ -90,10 +120,22 @@ class OrderService
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
 
+                Log::channel('application')->error($exceptionMessage);
+
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
 
+            Log::channel('application')->info(
+                'The sommelier checks the availability of wines.',
+                $this->orderRepo->order->getAttributes()
+            );
+
+            /**
+             * Dispatch DeliverOrder Job
+             */
             DeliverOrder::dispatch($this->orderRepo->order);
+
+            Log::channel('application')->info('DeliverOrder Job was successfully queued.');
 
             $this->sommelierRepo->setAvailable($sommelierId);
 
@@ -125,13 +167,20 @@ class OrderService
 
             $this->orderRepo->order = $order;
 
+            Log::channel('application')->info(
+                'The waiter delivers and closes the order.',
+                $this->orderRepo->order->getAttributes()
+            );
+
             $status = $this->orderRepo->deliverOrder();
 
             if (true !== $status) {
                 $exceptionMessage = sprintf(
-                    'Could not deliver the order: %s',
+                    'Could not deliver and close the order: %s',
                     print_r($this->orderRepo->order->getAttributes(), true)
                 );
+
+                Log::channel('application')->error($exceptionMessage);
 
                 throw new \Exception($exceptionMessage, Response::HTTP_EXPECTATION_FAILED);
             }
