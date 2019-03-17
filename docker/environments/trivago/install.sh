@@ -152,72 +152,20 @@ if [[ "$yn" != "n" ]]; then
 
     echo -e "\n"
 
-    docker-compose -f $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml --project-name "$r_projectname" up -d --force-recreate --build --remove-orphans
-
     cp $projectpath/.env.example $projectpath/.env
 
-    docker exec --user docker $r_projectname-php-fpm php -r "file_put_contents('$r_projectname/.env', str_replace([
-        'APP_NAME=Laravel',
-        'APP_URL=http://localhost',
-        'DB_CONNECTION=mysql',
-        'DB_HOST=127.0.0.1',
-        'DB_PORT=3306',
-        'DB_USERNAME=homestead',
-        'DB_PASSWORD=secret',
-        'DB_DATABASE=homestead'
-    ], [
-        'APP_NAME=$r_projectname',
-        'APP_URL=http://$appurl',
-        'DB_CONNECTION=$dbconnection',
-        'DB_HOST=$dbhost',
-        'DB_PORT=${dbport%?}',
-        'DB_USERNAME=$dbuser',
-        'DB_PASSWORD=$dbpass',
-        'DB_DATABASE=$dbname'
-    ], file_get_contents('$r_projectname/.env')));"
+    sed -i "s/APP_NAME\=Laravel/APP_NAME\=$r_projectname/g" $projectpath/.env
+    sed -i "s/APP_URL\=http\:\/\/localhost/APP_URL\=http\:\/\/$appurl/g" $projectpath/.env
+    sed -i "s/DB_CONNECTION\=mysql/DB_CONNECTION\=$dbconnection/g" $projectpath/.env
+    sed -i "s/DB_HOST\=127\.0\.0\.1/DB_HOST\=$dbhost/g" $projectpath/.env
+    sed -i "s/DB_PORT\=3306/DB_PORT\=${dbport%?}/g" $projectpath/.env
+    sed -i "s/DB_USERNAME\=homestead/DB_USERNAME\=$dbuser/g" $projectpath/.env
+    sed -i "s/DB_PASSWORD\=secret/DB_PASSWORD\=$dbpass/g" $projectpath/.env
+    sed -i "s/DB_DATABASE\=homestead/DB_DATABASE\=$dbname/g" $projectpath/.env
 
-    read -p "Would you like to configure smtp (this is required if you want to send emails) y/n? [n]: " yn
-    if [ "$yn" = "y" ]; then
+    docker-compose -f $DOCKER_PROJECT_PATH/environments/trivago/docker-compose.yml --project-name "$r_projectname" up -d --force-recreate --build --remove-orphans
 
-        read -p "Encryption type [tls]: " encryptiontype
-        if [ -z "$encryptiontype" ]; then
-            encryptiontype="tls"
-        fi
-
-        read -p "SMTP host [smtp.gmail.com]: " smtphost
-        if [ -z "$smtphost" ]; then
-            smtphost="smtp.gmail.com"
-        fi
-
-        read -p "SMTP port [587]: " smtpport
-        if [ -z "$smtpport" ]; then
-            smtpport="587"
-        fi
-
-        read -p "SMTP user [user@gmail.com]: " smtpuser
-        if [ -z "$smtpuser" ]; then
-            smtpuser="user@gmail.com"
-        fi
-
-        read -p "SMTP password [null]: " smptpass
-        if [ -z "$smptpass" ]; then
-            smptpass="null"
-        fi
-
-        docker exec --user docker $r_projectname-php-fpm php -r "file_put_contents('$r_projectname/.env', str_replace([
-            'MAIL_HOST=mailtrap.io',
-            'MAIL_PORT=2525',
-            'MAIL_USERNAME=null',
-            'MAIL_PASSWORD=null',
-            'MAIL_ENCRYPTION=null'
-        ], [
-            'MAIL_HOST=$smtphost',
-            'MAIL_PORT=$smtpport',
-            'MAIL_USERNAME=$smtpuser',
-            'MAIL_PASSWORD=$smptpass',
-            'MAIL_ENCRYPTION=$encryptiontype'
-        ], file_get_contents('$r_projectname/.env')));"
-    fi
+    sleep 15
 
     docker exec --user docker $r_projectname-php-fpm /bin/bash -c "cd $r_projectname && composer install"
 
@@ -253,7 +201,7 @@ if [[ "$yn" != "n" ]]; then
         echo -e "Please, put in your $etchosts file the host of this project: $hostsline\n"
     fi
 
-    echo -e "Project \e[32m$r_projectname\e[0m was successfully installed \n"
+    echo -e "\nProject \e[32m$r_projectname\e[0m was successfully installed \n"
 
     echo -e "Click the link below to access the project: \n"
 
