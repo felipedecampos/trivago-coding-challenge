@@ -61,10 +61,11 @@ $ cd docker && ./run.sh
     > Network set up: trivago > 180.12.0.0
     
 3\) 3- Install project: Trivago 
+
+**Note: If you want to insert the \[default value\], just press the Enter button**
+
   - Project name \[trivago-coding-challenge\]: 
     > trivago-coding-challenge 
-  - Do you want to clone the project \(notice: This command will clone the project from a github repository\) y/n? \[n\]: 
-    > n
   - Project PATH \[/home/USER/Workspace/trivago-coding-challenge\]: 
     > /home/$USER/Workspace/trivago-coding-challenge 
   - App url \[trivago-coding-challenge.local\]: 
@@ -87,12 +88,6 @@ $ cd docker && ./run.sh
     > trivago-coding-challenge
   - Postgres data path \[/home/USER/Workspace/.db/postgres/trivago-coding-challenge\]:
     > /home/$USER/Workspace/.db/postgres/trivago-coding-challenge
-  - Redis host \[180.12.0.5\]:
-    > 180.12.0.5
-  - Redis port \[63798\] (you must use 5 characters):
-    > 63798
-  - Redis data path \[/home/USER/Workspace/.redis/trivago-coding-challenge\]:
-    > /home/$USER/Workspace/.redis/trivago-coding-challenge
   - Are you sure you want to install the project \[trivago-coding-challenge\] y/n? \[y\]:
     > y
   - Would you like to configure smtp \(this is required if you want to send emails\) y/n? \[n\]:
