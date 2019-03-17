@@ -198,7 +198,7 @@ if [[ "$yn" != "n" ]]; then
                 fi
         fi
     else
-        echo -e "Please, put in your $etchosts file the host of this project: $hostsline\n"
+        echo -e "\n\e[33mPlease, put in your /etc/hosts file the host of this project: \n\n$nginxhost\t$appurl\e[0m\n"
     fi
 
     echo -e "\nProject \e[32m$r_projectname\e[0m was successfully installed \n"
