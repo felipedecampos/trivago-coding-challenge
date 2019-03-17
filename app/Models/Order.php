@@ -42,9 +42,8 @@ class Order extends Model
     {
         parent::boot();
 
-        static::deleted(function(Order $order)
-        {
-            $order->wine_order()->delete();
+        static::deleted(function (Order $order) {
+            $order->wineOrder()->delete();
         });
     }
 
@@ -70,7 +69,7 @@ class Order extends Model
      * Retrieve wines of this order
      * @return BelongsToMany
      */
-    public function wine_order()
+    public function wineOrder()
     {
         return $this->belongsToMany(Wine::class, 'wine_orders', 'order_id', 'wine_guid')
             ->withPivot('status');

@@ -74,7 +74,7 @@
                                     </div>
                                     <div class="row m-3">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            @foreach($order->wine_order as $wineKey => $wines)
+                                            @foreach($order->wineOrder as $wineKey => $wines)
                                                 <div class="row">
                                                     <div class="
                                                         col-lg-6

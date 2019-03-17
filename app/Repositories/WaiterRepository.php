@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Waiter;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
 use Illuminate\Http\Response;
@@ -18,7 +17,8 @@ class WaiterRepository implements RepositoryInterface
      */
     public $waiter;
 
-    function __construct(Waiter $waiter) {
+    public function __construct(Waiter $waiter)
+    {
         $this->waiter = $waiter;
     }
 

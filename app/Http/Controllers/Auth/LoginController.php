@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Log\LogManager;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
@@ -31,18 +31,25 @@ class LoginController extends Controller
     protected $redirectTo = '/home';
 
     /**
+     * @var LogManager
+     */
+    protected $logManager;
+
+    /**
      * Create a new controller instance.
      *
-     * @return void
+     * @param LogManager $logManager
      */
-    public function __construct()
+    public function __construct(LogManager $logManager)
     {
         $this->middleware('guest')->except('logout');
+
+        $this->logManager = $logManager;
     }
 
     public function showLoginForm()
     {
-        Log::channel('application')->info('The customer enters in the login page.');
+        $this->logManager->channel('application')->info('The customer enters in the login page.');
 
         return view('auth.login');
     }
@@ -55,7 +62,7 @@ class LoginController extends Controller
      */
     protected function sendLoginResponse(Request $request)
     {
-        Log::channel('application')->info(
+        $this->logManager->channel('application')->info(
             'The customer submits the login form.',
             [$this->guard()->user()->getAuthIdentifierName() => $this->guard()->user()->getAuthIdentifier()]
         );
@@ -78,9 +85,7 @@ class LoginController extends Controller
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        Log::channel('application')->info(
-            'The customer could not login to the application.'
-        );
+        $this->logManager->channel('application')->info('The customer could not login to the application.');
 
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
@@ -95,7 +100,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        Log::channel('application')->info(
+        $this->logManager->channel('application')->info(
             'The customer logout of the application.',
             [$this->guard()->user()->getAuthIdentifierName() => $this->guard()->user()->getAuthIdentifier()]
         );

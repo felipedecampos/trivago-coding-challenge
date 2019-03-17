@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Sommelier;
 use App\Repositories\RepositoryInterface\RepositoryInterface;
 use Illuminate\Http\Response;
@@ -18,7 +17,8 @@ class SommelierRepository implements RepositoryInterface
      */
     public $sommelier;
 
-    function __construct(Sommelier $sommelier) {
+    public function __construct(Sommelier $sommelier)
+    {
         $this->sommelier = $sommelier;
     }
 
