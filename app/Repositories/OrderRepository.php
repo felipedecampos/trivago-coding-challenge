@@ -22,7 +22,8 @@ class OrderRepository implements RepositoryInterface
      */
     public $wineOrder;
 
-    function __construct(Order $order, WineOrder $wineOrder) {
+    public function __construct(Order $order, WineOrder $wineOrder)
+    {
         $this->order     = $order;
         $this->wineOrder = $wineOrder;
     }
@@ -30,7 +31,7 @@ class OrderRepository implements RepositoryInterface
     public function getAll()
     {
         return $this->order->where('user_id', '=', auth()->user()->getAuthIdentifier())
-            ->with('wine_order')
+            ->with('wineOrder')
             ->with('waiter')
             ->with('sommelier')
             ->orderBy('id', 'DESC')
@@ -39,7 +40,7 @@ class OrderRepository implements RepositoryInterface
 
     public function find($id)
     {
-        return $this->order->query()->with('wine_order')->find($id);
+        return $this->order->query()->with('wineOrder')->find($id);
     }
 
     public function put($orderForm)
@@ -86,7 +87,9 @@ class OrderRepository implements RepositoryInterface
             }
         }
 
-        return count(array_filter($status, function ($s){ return $s === true; })) === count($wines) + 1; // 1 = order
+        return count(array_filter($status, function ($s) {
+            return $s === true;
+        })) === count($wines) + 1; // 1 = order
     }
 
     public function delete($id)
@@ -117,7 +120,7 @@ class OrderRepository implements RepositoryInterface
 
     public function processAvailabilityOfWines()
     {
-        $this->order->wine_order->map(function (&$item) {
+        $this->order->wineOrder->map(function (&$item) {
             $pubDate = new \DateTime($item->pub_date);
             $tz      = $pubDate->getTimezone();
             $now     = new \DateTime('now', $tz);

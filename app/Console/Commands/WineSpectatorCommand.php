@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\WineSpectatorService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Log\LogManager;
 
 class WineSpectatorCommand extends Command
 {
@@ -36,12 +36,13 @@ class WineSpectatorCommand extends Command
      * Execute the console command.
      *
      * @param WineSpectatorService $wineSpectator
+     * @param LogManager $logManager
      * @return bool
      * @throws \Exception
      */
-    public function handle(WineSpectatorService $wineSpectator)
+    public function handle(WineSpectatorService $wineSpectator, LogManager $logManager)
     {
-        Log::channel('application')->info(
+        $logManager->channel('application')->info(
             'The command was successfully ran.',
             ['command' => 'wine-spectator:watch ' . $this->argument('date')]
         );

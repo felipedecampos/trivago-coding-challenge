@@ -5,6 +5,9 @@ namespace Tests\Unit\Services;
 use App\Repositories\WineSpectatorRepository;
 use App\Services\WineSpectatorService;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Log\LogManager;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
 
@@ -24,6 +27,15 @@ class WineSpectatorServiceTest extends TestCase
     private $wineSpectatorRepository;
 
     /**
+     * @var LogManager|MockObject
+     */
+    private $logManager;
+    /**
+     * @var TestHandler
+     */
+    private $loggerHandler;
+
+    /**
      * @var WineSpectatorService
      */
     private $service;
@@ -39,7 +51,18 @@ class WineSpectatorServiceTest extends TestCase
 
         $this->wineSpectatorRepository = $this->createMock(WineSpectatorRepository::class);
 
-        $this->service = new WineSpectatorService($rssUrl, $this->db, $this->wineSpectatorRepository);
+        $this->loggerHandler = new TestHandler();
+        $this->logManager    = $this->createMock(LogManager::class);
+
+        $this->logManager->method('channel')
+            ->willReturn(new Logger('test', [$this->loggerHandler]));
+
+        $this->service = new WineSpectatorService(
+            $rssUrl,
+            $this->db,
+            $this->wineSpectatorRepository,
+            $this->logManager
+        );
 
         parent::setUp();
     }
@@ -52,41 +75,43 @@ class WineSpectatorServiceTest extends TestCase
     {
         $this->db->expects(self::once())->method('beginTransaction');
         $this->db->expects(self::once())->method('commit');
-        $this->db->expects(self::never())->method('rollback');
 
         $this->wineSpectatorRepository->expects(self::exactly(3))
             ->method('put')
             ->withConsecutive(
                 [
-                    [
-                        'guid'     => 'https://www.winespectator.com/dailypicks/show/date/2019-03-16/dwpid/15382',
-                        'link'     => 'https://www.winespectator.com/dailypicks/show/date/2019-03-16/dwpid/15382',
-                        'title'    => 'CHARLES SMITH Rosé Band of Roses Washington 2017 $13 (Wine Spectator)',
-                        'pub_date' => 'Sat, 16 Mar 2019 00:00:00 -0400',
-                    ]
+                    static::identicalTo([
+                        'title' => 'CHÂTEAU TEYSSIER St.-Emilion 2016 $13 (Wine Spectator)',
+                        'link' => 'https://www.winespectator.com/dailypicks/show/date/2019-03-08/dwpid/15361',
+                        'guid' => 'https://www.winespectator.com/dailypicks/show/date/2019-03-08/dwpid/15361',
+                        'pub_date' => 'Fri, 08 Mar 2019 00:00:00 -0500',
+                    ])
                 ],
                 [
-                    [
-                        'guid'     => 'https://www.winespectator.com/dailypicks/show/date/2019-03-16/dwpid/15383',
-                        'link'     => 'https://www.winespectator.com/dailypicks/show/date/2019-03-16/dwpid/15383',
-                        'title'    => 'DUCK HUNTER Pinot Noir Marlborough 2018 $30 (Wine Spectator)',
-                        'pub_date' => 'Sat, 16 Mar 2019 00:00:00 -0400',
-                    ],
+                    static::identicalTo([
+                        'title' => 'NIGL Grüner Veltliner Niederösterreich Freiheit 2017 $20 (Wine Spectator)',
+                        'link' => 'https://www.winespectator.com/dailypicks/show/date/2019-03-08/dwpid/15362',
+                        'guid' => 'https://www.winespectator.com/dailypicks/show/date/2019-03-08/dwpid/15362',
+                        'pub_date' => 'Fri, 08 Mar 2019 00:00:00 -0500',
+                    ]),
                 ],
                 [
-                    [
-                        'guid'     => 'https://www.winespectator.com/dailypicks/show/date/2019-03-16/dwpid/15384',
-                        'link'     => 'https://www.winespectator.com/dailypicks/show/date/2019-03-16/dwpid/15384',
-                        'title'    => 'DOW Tawny Port 20 Year Old NV $65 (Wine Spectator)',
-                        'pub_date' => 'Sat, 16 Mar 2019 00:00:00 -0400',
-                    ],
+                    static::identicalTo([
+                        'title' => 'SPRING MOUNTAIN VINEYARD Elivette Napa Valley 2015 $150 (Wine Spectator)',
+                        'link' => 'https://www.winespectator.com/dailypicks/show/date/2019-03-08/dwpid/15363',
+                        'guid' => 'https://www.winespectator.com/dailypicks/show/date/2019-03-08/dwpid/15363',
+                        'pub_date' => 'Fri, 08 Mar 2019 00:00:00 -0500',
+                    ]),
                 ]
             )
             ->willReturn(true);
 
-        $date = new \DateTime('2019-03-16', new \DateTimeZone('+00:00'));
+        $date = new \DateTime('2019-03-08', new \DateTimeZone('-05:00'));
 
         $this->service->updateWines($date);
+
+        static::assertTrue($this->loggerHandler->hasInfoRecords());
+        static::assertFalse($this->loggerHandler->hasErrorRecords());
     }
 
     /**
@@ -96,7 +121,6 @@ class WineSpectatorServiceTest extends TestCase
     public function testUpdateWinesFails()
     {
         $this->db->expects(self::once())->method('beginTransaction');
-        $this->db->expects(self::never())->method('commit');
         $this->db->expects(self::once())->method('rollback');
 
         $this->expectException(\Exception::class);
@@ -107,5 +131,8 @@ class WineSpectatorServiceTest extends TestCase
             ->willReturn(false);
 
         $this->service->updateWines();
+
+        static::assertTrue($this->loggerHandler->hasErrorRecords());
+        static::assertFalse($this->loggerHandler->hasInfoRecords());
     }
 }
