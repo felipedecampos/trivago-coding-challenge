@@ -9,6 +9,109 @@
 ## ** Project BOARD (Kanban) **
 [Link to Kanban](https://github.com/felipedecampos/trivago-coding-challenge/projects/1)
 
+## ** What has been done **
+
+First you will need to install the application environment with docker-compose
+
+[Go to How to install the project environment](https://github.com/felipedecampos/trivago-coding-challenge#-how-to-install-the-project-environment-)
+
+The script didn't work?
+
+[Go to How to manually install the project environment](https://github.com/felipedecampos/trivago-coding-challenge#the-script-didnt-work)
+
+Then you will need to register on site to place orders.
+
+Press the Register button on home page. Enter your name, e-mail address, password, and confirm your password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
+
+You will be taken to the index page. To place an order, click the button + Place order. Select one or more wines from the list. The options in green are the available wines of the day (just to make easier testing the application).
+
+After selecting the wines, click Submit. You will be taken to the index page with your orders list. Your order status will be Open and each item status is displayed as Placed. Press F5 to refresh the page until your order status is updated to Closed. Jobs will be setup to be run every 20 seconds to make easier viewing jobs steps while testing the application.
+
+In the first job, you will be assigned an available waiter to process your order and send it to the sommelier to check the availability of the wines.
+
+In the last job, the waiter will deliver and close the order.
+
+After delivery of the order, your order status will change to Closed and your items will be displayed as Delivered or Unavailable according to sommelier’s response.
+
+## ** Testing **
+
+To test the application go to the **project folder** and run the tests:
+
+```shell
+$ vendor/bin/phpunit
+```
+
+## ** PHP Standards Recommendations **
+
+To validate the code for consistency with a coding standard go to the **project folder** and run the commands:
+
+**PSR-1**
+```shell
+$ vendor/bin/phpcs --standard=PSR1 --extensions=php --ignore=*/database/*,*/resources/*,*/storage/*,*/vendor/*,*/public/index.php,*/tests/bootstrap.php,*/bootstrap/cache/* .
+```
+
+**PSR-2**
+
+```shell
+$ vendor/bin/phpcs --standard=PSR2 --extensions=php --ignore=*/database/*,*/resources/*,*/storage/*,*/vendor/*,*/public/index.php,*/tests/bootstrap.php,*/bootstrap/cache/* .
+```
+
+**PSR-12**
+
+```shell
+$ vendor/bin/phpcs --standard=PSR12 --extensions=php --ignore=*/database/*,*/resources/*,*/storage/*,*/vendor/*,*/public/index.php,*/tests/bootstrap.php,*/bootstrap/cache/* .
+```
+
+## ** Logs **
+
+**To monitor the logs, follow the steps bellow:**
+
+In the **project folder** run:  
+
+```shell
+$ cd docker && ./run.sh
+```
+
+**Enter the options bellow in the menu:**
+
+When asked to "Type the service number you want to use:", enter option: **4- Enter into container: Trivago**
+> 4
+
+When asked to "Type the container number you want to enter:", enter option: **2- PROJECT-NAME-php-fpm**
+> 2
+
+To view the application log in real time, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/application.log
+```
+
+To view the application queries log in real time, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/queries.log
+```
+
+To view the ran jobs log in real time, run into container (PROJECT-NAME-php-fpm):
+```shell
+$ tail -f storage/logs/worker.log
+```
+
+To view view the crontab log in real time, run into container (*php-fpm):
+```shell
+$ tail -f storage/logs/crontab.log
+```
+
+## ** Wines catalog **
+
+Wines catalog according to RSS link will be updated everyday at 9AM with crontab set up. If you want to manually update all wines according to RSS link, run into container (php-fpm):
+```shell
+$ php artisan wine-spectator:watch all
+```
+
+If you want to manually update only the wines available today according to RSS link, run into container (php-fpm):
+```shell
+$ php artisan wine-spectator:watch
+```
+
 ## ** How to install the project environment **
 
 #### Linux:
@@ -49,21 +152,30 @@ In the **project folder** run:
 $ cd docker && ./run.sh
 ```
 
-**Follow the steps bellow:**
+**Enter the options bellow in the menu:**
 
-1\)  2- Set up new Network
+When asked to "Type the service number you want to use:", enter option: **2- Set up new Network** 
+> 2
+
   - Type the network name \[example: trivago\]: 
     > trivago
+
   - Type an IP for the network: 
     > 180.12.0.0
-  - You should see
-    > Network trivago successfully set up
 
-2\) 1- Show current Network 
-  - You should see
-    > Network set up: trivago > 180.12.0.0
-    
-3\) 3- Install project: Trivago 
+You should see: **Network trivago successfully set up**
+
+Press Enter to go back to the menu
+
+When asked to "Type the service number you want to use:", enter option: **1- Show current Network**
+> 1
+
+You should see: **Network set up: trivago > 180.12.0.0**
+
+Press Enter to go back to the menu
+
+When asked to "Type the service number you want to use:", enter option: **3- Install project: Trivago **
+> 3
 
 **Note: If you want to insert the \[default value\], just press the Enter button**
 
@@ -217,72 +329,24 @@ docker exec --user docker trivago-coding-challenge-php-fpm /bin/bash -c "cd triv
 sudo -- sh -c -e "echo '180.12.0.2\ttrivago-coding-challenge.local' >> /etc/hosts";
 ```
 
-## ** Testing **
+## ** How to uninstall the project environment **
 
-To test the application go to the project folder and run tests:
-```shell
-$ vendor/bin/phpunit
-```
-
-## ** Logs **
-
-**To follow-up the logs, follow the steps bellow:**
-
-In the **project folder** run:  
+In the **project folder** run:
 
 ```shell
 $ cd docker && ./run.sh
 ```
 
-**Enter the options bellow:**
+**Enter the options bellow in the menu:**
 
-1\) 4- Enter into container: Trivago
+When asked to "Type the service number you want to use:", enter option: **5- Uninstall project: Trivago** 
+> 5
 
-2\) 2- PROJECT-NAME-php-fpm
+When asked to "Are you sure you want to uninstall the project PROJECT-NAME (notice: There is no way to undo this) y/n? [n]:", enter option: **y**
+> y
 
-To “live” view the application log, run into container (PROJECT-NAME-php-fpm):
-```shell
-$ tail -f storage/logs/application.log
-```
+When asked to "Do you want to remove the project host on your /etc/hosts file? (warning: This command needs the sudo privilege) y/n? [n]:", enter option: **y**
+> y
 
-To “live” view the application queries log, run into container (PROJECT-NAME-php-fpm):
-```shell
-$ tail -f storage/logs/queries.log
-```
-
-To “live” view the ran jobs log, run into container (PROJECT-NAME-php-fpm):
-```shell
-$ tail -f storage/logs/worker.log
-```
-
-To “live” view the crontab log, run into container (*php-fpm):
-```shell
-$ tail -f storage/logs/crontab.log
-```
-
-## ** Wines catalog **
-
-Wines catalog according to RSS link will be updated everyday at 9AM with crontab set up. If you want to manually update all wines according to RSS link, run into container (php-fpm):
-```shell
-$ php artisan wine-spectator:watch all
-```
-
-If you want to manually update only the wines available today according to RSS link, run into container (php-fpm):
-```shell
-$ php artisan wine-spectator:watch
-```
-
-## ** What has been done **
-You will need to register on site to place orders.
-
-Press the Register button on home page. Enter your name, e-mail address, password, and confirm your password – to confirm your password, you must enter the exact same password typed in the previous field. Click the Register button.
-
-You will be taken to the index page. To place an order, click the button + Place order. Select one or more wines from the list. The options in green are the available wines of the day (just to make easier testing the application).
-
-After selecting the wines, click Submit. You will be taken to the index page with your orders list. Your order status will be Open and each item status is displayed as Placed. Press F5 to refresh the page until your order status is updated to Closed. Jobs will be setup to be run every 20 seconds to make easier viewing jobs steps while testing the application.
-
-In the first job, you will be assigned an available waiter to process your order and send it to the sommelier to check the availability of the wines.
-
-In the last job, the waiter will deliver and close the order.
-
-After delivery of the order, your order status will change to Closed and your items will be displayed as Delivered or Unavailable according to sommelier’s response.
+When asked to "Do you want to remove the project repository (notice: There is no way to undo this) y/n? [n]:", enter option: **y**
+> y
